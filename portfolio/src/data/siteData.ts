@@ -1,4 +1,7 @@
 import type { NavItem, ProjectItem } from '../types'
+import drasticShot from '../assets/screenshots/mapSH.png'
+import earthShot from '../assets/screenshots/Earth3d.png'
+import plantShot from '../assets/screenshots/PHmain.jpeg'
 
 export const navItems: NavItem[] = [
   { id: 'hero', label: 'Neural Deck', shortcut: '1' },
@@ -12,6 +15,7 @@ export const projects: ProjectItem[] = [
   {
     id: 'drastic-planner',
     name: 'DRASTIC Planner',
+    image: drasticShot,
     overview:
       'A desktop decision-support system for humanitarian crisis scenario planning that transforms uncertain inputs into actionable operational insights across coverage, staffing, logistics, cost modeling, and risk analysis.',
     headline: 'Desktop scenario-planning system for high-stakes humanitarian operations.',
@@ -59,6 +63,7 @@ export const projects: ProjectItem[] = [
   {
     id: 'earth-3d-dashboard',
     name: 'Earth 3D Dashboard',
+    image: earthShot,
     overview:
       'An interactive 3D Earth visualization platform that renders scientific datasets on a fully explorable globe with layered insights and story-driven educational context.',
     headline: 'WebGL-powered scientific globe with dynamic layered storytelling.',
@@ -107,6 +112,7 @@ export const projects: ProjectItem[] = [
   {
     id: 'plant-haven',
     name: 'Plant Haven',
+    image: plantShot,
     overview:
       'A full-stack e-commerce platform for plant shopping with secure payments, auth, recommendations, and production-oriented deployment infrastructure.',
     headline: 'Serverless commerce platform with secure checkout and personalized shopping flows.',

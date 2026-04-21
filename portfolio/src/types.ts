@@ -8,6 +8,7 @@ export type SectionId =
 export type ProjectItem = {
   id: string
   name: string
+  image: string
   overview: string
   headline: string
   summary: string
