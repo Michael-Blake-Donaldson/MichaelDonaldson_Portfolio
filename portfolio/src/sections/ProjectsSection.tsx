@@ -81,9 +81,12 @@ export default function ProjectsSection({
               soundFx.playHover()
               setHoverProjectId(project.id)
             }}
-          className="group relative w-full overflow-hidden rounded-2xl border border-white/15 bg-[linear-gradient(120deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01))] px-4 py-3 text-left backdrop-blur-md transition hover:border-neon/40 hover:bg-neon/10"
+          className="group relative w-full overflow-hidden rounded-[1.4rem] border border-white/15 bg-[linear-gradient(120deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01))] px-5 py-4 text-left backdrop-blur-md transition hover:border-neon/50 hover:bg-neon/10"
         >
-          <span className="pointer-events-none absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-neon via-arc to-plasma opacity-55" />
+          <span className="pointer-events-none absolute left-0 top-0 h-full w-[3px] bg-gradient-to-b from-neon via-arc to-plasma opacity-70" />
+          <span className="pointer-events-none absolute right-3 top-3 rounded-full border border-neon/35 bg-neon/10 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-neon/85">
+            Launch Case Study
+          </span>
           <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/45">
             {project.tags.join(' / ')}
           </p>
@@ -113,7 +116,7 @@ export default function ProjectsSection({
     <section ref={rootRef} className="relative min-h-[84vh] overflow-hidden px-6 pb-24 pt-16 md:px-14">
       <p className="text-xs uppercase tracking-[0.28em] text-neon/75">Project Vault</p>
       <h2 className="mt-3 max-w-3xl font-display text-3xl text-white md:text-5xl">
-        Four production-style case studies with system architecture, tradeoffs, and engineering depth.
+        Three flagship systems engineered for depth: architecture, tradeoffs, and production-grade execution.
       </h2>
 
       <div className="project-atlas pointer-events-none absolute right-8 top-24 hidden w-[360px] rounded-3xl border border-white/15 bg-white/5 p-5 backdrop-blur-xl lg:block">
@@ -136,7 +139,7 @@ export default function ProjectsSection({
       </div>
 
       <LayoutGroup>
-        <div className="mt-8 grid gap-3 pr-0 md:grid-cols-3 lg:pr-[390px]">{projectPreview}</div>
+        <div className="mt-8 space-y-3 pr-0 lg:pr-[390px]">{projectPreview}</div>
 
         <AnimatePresence>
           {loading ? (
