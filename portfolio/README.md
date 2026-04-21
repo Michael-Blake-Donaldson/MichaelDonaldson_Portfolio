@@ -1,73 +1,59 @@
-# React + TypeScript + Vite
+# Neural Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A cinematic developer portfolio built with React, TypeScript, Vite, Tailwind CSS, Framer Motion, and GSAP.
 
-Currently, two official plugins are available:
+## Experience Highlights
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Futuristic dark UI with glassmorphism and glow accents
+- Animated boot sequence intro
+- Floating command palette inspired by IDE workflows
+- Keyboard-first navigation and section transitions
+- Full-screen project expansion with dynamic previews
+- GSAP scroll-triggered timeline and project parallax
+- Custom cursor, particle field, magnetic button interactions
+- Optional synthetic sound effects for hover/click feedback
+- Hidden easter egg (Konami sequence)
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19 + TypeScript
+- Vite 5
+- Tailwind CSS 3
+- Framer Motion
+- GSAP + ScrollTrigger
+- cmdk + lucide-react
 
-## Expanding the ESLint configuration
+## Development
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Install dependencies:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Run locally:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+Build production bundle:
+
+```bash
+npm run build
+```
+
+## Keyboard Shortcuts
+
+- Ctrl+K / Cmd+K: open command palette
+- 1-5: jump to section
+- Left / Right arrows: cycle between sections
+- M: toggle sound effects
+- D (Project Vault): toggle incident simulation mode
+
+## Architecture Notes
+
+- Route-like section swapping is orchestrated in `App.tsx` with lazy-loaded sections.
+- Shared interaction primitives live in `src/hooks` and `src/components`.
+- Data definitions are centralized in `src/data/siteData.ts`.
+- GSAP is scoped using `gsap.context` to avoid animation leaks.
