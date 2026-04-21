@@ -6,9 +6,17 @@ import { MagneticButton } from '../components/ui/MagneticButton'
 type HeroSectionProps = {
   onNavigateProjects: () => void
   pointer: { x: number; y: number }
+  soundFx: {
+    playHover: () => void
+    playClick: () => void
+  }
 }
 
-export default function HeroSection({ onNavigateProjects, pointer }: HeroSectionProps) {
+export default function HeroSection({
+  onNavigateProjects,
+  pointer,
+  soundFx,
+}: HeroSectionProps) {
   const typed = useTypingEffect([
     'Designing interfaces with cinematic intent.',
     'Shipping products with engineering precision.',
@@ -68,8 +76,20 @@ export default function HeroSection({ onNavigateProjects, pointer }: HeroSection
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.28 }}
       >
-        <MagneticButton onClick={onNavigateProjects}>Enter Project Vault</MagneticButton>
-        <MagneticButton tone="ghost">Download Signal Resume</MagneticButton>
+        <MagneticButton
+          onClick={onNavigateProjects}
+          onHoverSound={soundFx.playHover}
+          onClickSound={soundFx.playClick}
+        >
+          Enter Project Vault
+        </MagneticButton>
+        <MagneticButton
+          tone="ghost"
+          onHoverSound={soundFx.playHover}
+          onClickSound={soundFx.playClick}
+        >
+          Download Signal Resume
+        </MagneticButton>
       </motion.div>
 
       <motion.div

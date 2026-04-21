@@ -8,6 +8,7 @@ import { FloatingDock } from './components/navigation/FloatingDock'
 import { navItems, projects } from './data/siteData'
 import { useEasterEgg } from './hooks/useEasterEgg'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
+import { useSoundFx } from './hooks/useSoundFx'
 import type { SectionId } from './types'
 
 const HeroSection = lazy(() => import('./sections/HeroSection'))
@@ -34,6 +35,7 @@ function App() {
     y: window.innerHeight / 2,
   })
   const { unlocked, reset } = useEasterEgg()
+  const soundFx = useSoundFx(false)
 
   useEffect(() => {
     const bootTimer = window.setTimeout(() => setBootDone(true), 2800)
@@ -66,6 +68,7 @@ function App() {
       '3': () => setActiveSection('command-center'),
       '4': () => setActiveSection('timeline'),
       '5': () => setActiveSection('skills'),
+      m: () => soundFx.toggle(),
       arrowright: () => {
         setActiveSection((prev) => {
           const current = sectionOrder.indexOf(prev)
@@ -79,7 +82,7 @@ function App() {
         })
       },
     }),
-    [],
+    [soundFx],
   )
 
   useKeyboardShortcuts(shortcuts)
@@ -112,12 +115,14 @@ function App() {
                 <HeroSection
                   onNavigateProjects={() => setActiveSection('projects')}
                   pointer={pointer}
+                  soundFx={soundFx}
                 />
               ) : null}
               {activeSection === 'projects' ? (
                 <ProjectsSection
                   initialProjectId={pendingProjectId}
                   clearInitialProject={() => setPendingProjectId(undefined)}
+                  soundFx={soundFx}
                 />
               ) : null}
               {activeSection === 'command-center' ? <CommandCenterSection /> : null}
@@ -133,6 +138,10 @@ function App() {
         active={activeSection}
         onSelect={setActiveSection}
         onPalette={() => setPaletteOpen(true)}
+        soundEnabled={soundFx.enabled}
+        onToggleSound={soundFx.toggle}
+        onUiHover={soundFx.playHover}
+        onUiClick={soundFx.playClick}
       />
 
       <CommandPalette
@@ -142,6 +151,7 @@ function App() {
         onOpenChange={setPaletteOpen}
         onNavigate={setActiveSection}
         onProjectOpen={(id) => {
+          soundFx.playClick()
           setPendingProjectId(id)
           setActiveSection('projects')
         }}
