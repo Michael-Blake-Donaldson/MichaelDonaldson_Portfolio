@@ -1,8 +1,9 @@
-import { useEffect, useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { projects } from '../data/siteData'
+import type { ProjectItem } from '../types'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -15,6 +16,86 @@ type ProjectsSectionProps = {
   }
 }
 
+function clamp(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, value))
+}
+
+function ArchitectureFlowDiagram({ project }: { project: ProjectItem }) {
+  const flow = project.systemFlow
+  const width = 640
+  const height = 170
+  const step = flow.length > 1 ? (width - 120) / (flow.length - 1) : 1
+
+  const points = flow.map((_, index) => {
+    const x = 60 + index * step
+    const y = index % 2 === 0 ? 65 : 105
+    return { x, y }
+  })
+
+  const pathD = points
+    .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`)
+    .join(' ')
+
+  return (
+    <section className="project-detail rounded-2xl border border-white/15 bg-black/25 p-5">
+      <p className="text-xs uppercase tracking-[0.2em] text-neon/75">Architecture Flow Diagram</p>
+      <div className="mt-4 overflow-hidden rounded-xl border border-white/10 bg-[#07101f]/70 p-3">
+        <motion.svg
+          viewBox={`0 0 ${width} ${height}`}
+          className="h-[170px] w-full"
+          initial={{ opacity: 0.4 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: false, amount: 0.6 }}
+        >
+          <motion.path
+            d={pathD}
+            fill="none"
+            stroke="rgba(88,246,210,0.8)"
+            strokeWidth="3"
+            strokeLinecap="round"
+            initial={{ pathLength: 0 }}
+            whileInView={{ pathLength: 1 }}
+            viewport={{ once: false, amount: 0.6 }}
+            transition={{ duration: 1.2, ease: 'easeInOut' }}
+          />
+          {points.map((point, index) => (
+            <motion.g
+              key={`${project.id}-node-${index}`}
+              initial={{ scale: 0.65, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
+              viewport={{ once: false, amount: 0.6 }}
+              transition={{ delay: 0.12 + index * 0.08, duration: 0.35 }}
+            >
+              <circle cx={point.x} cy={point.y} r={13} fill="rgba(106,166,255,0.2)" stroke="rgba(106,166,255,0.75)" strokeWidth="2" />
+              <text
+                x={point.x}
+                y={point.y + 4}
+                textAnchor="middle"
+                fontSize="10"
+                fill="rgba(255,255,255,0.95)"
+                fontFamily="JetBrains Mono, monospace"
+              >
+                {index + 1}
+              </text>
+            </motion.g>
+          ))}
+        </motion.svg>
+      </div>
+      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+        {flow.map((stepLabel, index) => (
+          <div
+            key={`${project.id}-legend-${stepLabel}`}
+            className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/80"
+          >
+            <span className="mr-2 font-mono text-neon/80">{index + 1}.</span>
+            {stepLabel}
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 export default function ProjectsSection({
   initialProjectId,
   clearInitialProject,
@@ -22,6 +103,8 @@ export default function ProjectsSection({
 }: ProjectsSectionProps) {
   const rootRef = useRef<HTMLElement | null>(null)
   const chapterRefs = useRef<Record<string, HTMLElement | null>>({})
+  const [progressById, setProgressById] = useState<Record<string, number>>({})
+  const [activeProjectId, setActiveProjectId] = useState(projects[0]?.id ?? '')
 
   useLayoutEffect(() => {
     const root = rootRef.current
@@ -77,12 +160,79 @@ export default function ProjectsSection({
     clearInitialProject()
   }, [initialProjectId, clearInitialProject])
 
+  useEffect(() => {
+    let rafId = 0
+
+    const updateProgress = () => {
+      if (rafId) return
+      rafId = window.requestAnimationFrame(() => {
+        const nextProgress: Record<string, number> = {}
+        let nearestId = projects[0]?.id ?? ''
+        let nearestDistance = Number.POSITIVE_INFINITY
+
+        for (const project of projects) {
+          const node = chapterRefs.current[project.id]
+          if (!node) continue
+
+          const rect = node.getBoundingClientRect()
+          const rawProgress = (window.innerHeight - rect.top) / (rect.height + window.innerHeight)
+          nextProgress[project.id] = clamp(rawProgress, 0, 1)
+
+          const chapterCenter = rect.top + rect.height / 2
+          const distanceToFocusLine = Math.abs(chapterCenter - window.innerHeight * 0.45)
+          if (rect.bottom > 0 && rect.top < window.innerHeight && distanceToFocusLine < nearestDistance) {
+            nearestDistance = distanceToFocusLine
+            nearestId = project.id
+          }
+        }
+
+        setProgressById(nextProgress)
+        setActiveProjectId(nearestId)
+        rafId = 0
+      })
+    }
+
+    updateProgress()
+    window.addEventListener('scroll', updateProgress, { passive: true })
+    window.addEventListener('resize', updateProgress)
+
+    return () => {
+      window.removeEventListener('scroll', updateProgress)
+      window.removeEventListener('resize', updateProgress)
+      if (rafId) window.cancelAnimationFrame(rafId)
+    }
+  }, [])
+
   return (
     <section ref={rootRef} className="relative min-h-[84vh] overflow-hidden px-6 pb-24 pt-16 md:px-14">
       <p className="text-xs uppercase tracking-[0.28em] text-neon/75">Project Vault</p>
       <h2 className="mt-3 max-w-3xl font-display text-3xl text-white md:text-5xl">
         Scroll the engineering narrative: three flagship systems, each unpacked as a full product architecture.
       </h2>
+
+      <aside className="pointer-events-none fixed right-6 top-1/2 z-20 hidden w-56 -translate-y-1/2 rounded-2xl border border-white/15 bg-black/45 p-4 backdrop-blur-xl lg:block">
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-neon/75">Scroll Progress</p>
+        <div className="mt-3 space-y-3">
+          {projects.map((project, index) => {
+            const progress = progressById[project.id] ?? 0
+            const isActive = project.id === activeProjectId
+            return (
+              <div key={`hud-${project.id}`}>
+                <div className={`text-[11px] uppercase tracking-[0.14em] ${isActive ? 'text-white' : 'text-white/50'}`}>
+                  {String(index + 1).padStart(2, '0')} {project.name}
+                </div>
+                <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-white/10">
+                  <motion.div
+                    className={`h-full ${isActive ? 'bg-gradient-to-r from-neon to-arc' : 'bg-white/35'}`}
+                    animate={{ width: `${Math.round(progress * 100)}%` }}
+                    transition={{ duration: 0.2 }}
+                  />
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </aside>
 
       <div className="mt-10 space-y-24">
         {projects.map((project, index) => (
@@ -146,6 +296,8 @@ export default function ProjectsSection({
                     ))}
                   </div>
                 </section>
+
+                <ArchitectureFlowDiagram project={project} />
 
                 <section className="project-detail rounded-2xl border border-white/15 bg-black/25 p-5">
                   <p className="text-xs uppercase tracking-[0.2em] text-neon/75">Tech Stack</p>
