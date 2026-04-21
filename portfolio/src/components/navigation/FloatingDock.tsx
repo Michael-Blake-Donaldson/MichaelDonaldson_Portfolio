@@ -1,4 +1,4 @@
-import { Command, Sparkles, Volume2, VolumeX } from 'lucide-react'
+import { Command, Sparkles, Volume2, VolumeX, Wind, Accessibility } from 'lucide-react'
 import clsx from 'clsx'
 import type { NavItem, SectionId } from '../../types'
 
@@ -8,7 +8,11 @@ type FloatingDockProps = {
   onSelect: (id: SectionId) => void
   onPalette: () => void
   soundEnabled: boolean
+  particlesEnabled: boolean
+  reducedMotionEnabled: boolean
   onToggleSound: () => void
+  onToggleParticles: () => void
+  onToggleReducedMotion: () => void
   onUiHover: () => void
   onUiClick: () => void
 }
@@ -19,7 +23,11 @@ export function FloatingDock({
   onSelect,
   onPalette,
   soundEnabled,
+  particlesEnabled,
+  reducedMotionEnabled,
   onToggleSound,
+  onToggleParticles,
+  onToggleReducedMotion,
   onUiHover,
   onUiClick,
 }: FloatingDockProps) {
@@ -27,6 +35,7 @@ export function FloatingDock({
     <div className="fixed bottom-5 left-1/2 z-40 w-[min(760px,94vw)] -translate-x-1/2 rounded-2xl border border-white/20 bg-white/5 p-2 backdrop-blur-xl">
       <div className="flex items-center justify-between gap-2">
         <button
+          aria-label="Open command palette"
           onClick={() => {
             onUiClick()
             onPalette()
@@ -57,6 +66,7 @@ export function FloatingDock({
             </button>
           ))}
           <button
+            aria-label={soundEnabled ? 'Disable sound effects' : 'Enable sound effects'}
             onClick={() => {
               onToggleSound()
               onUiClick()
@@ -66,6 +76,30 @@ export function FloatingDock({
           >
             {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
             {soundEnabled ? 'Audio On' : 'Audio Off'}
+          </button>
+          <button
+            aria-label={particlesEnabled ? 'Disable particle field' : 'Enable particle field'}
+            onClick={() => {
+              onToggleParticles()
+              onUiClick()
+            }}
+            onMouseEnter={onUiHover}
+            className="inline-flex items-center gap-1 rounded-lg border border-white/15 px-2 py-2 text-[10px] uppercase tracking-[0.16em] text-white/65 hover:border-neon/60 hover:text-neon"
+          >
+            <Wind className="h-4 w-4" />
+            {particlesEnabled ? 'Particles On' : 'Particles Off'}
+          </button>
+          <button
+            aria-label={reducedMotionEnabled ? 'Enable full motion' : 'Enable reduced motion'}
+            onClick={() => {
+              onToggleReducedMotion()
+              onUiClick()
+            }}
+            onMouseEnter={onUiHover}
+            className="inline-flex items-center gap-1 rounded-lg border border-white/15 px-2 py-2 text-[10px] uppercase tracking-[0.16em] text-white/65 hover:border-neon/60 hover:text-neon"
+          >
+            <Accessibility className="h-4 w-4" />
+            {reducedMotionEnabled ? 'Reduced Motion' : 'Full Motion'}
           </button>
         </div>
         <Sparkles className="hidden h-4 w-4 text-plasma/80 md:block" />

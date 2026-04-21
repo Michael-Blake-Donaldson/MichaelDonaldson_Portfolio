@@ -8,7 +8,9 @@ import { FloatingDock } from './components/navigation/FloatingDock'
 import { navItems, projects } from './data/siteData'
 import { useEasterEgg } from './hooks/useEasterEgg'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
+import { usePrefersReducedMotion } from './hooks/usePrefersReducedMotion'
 import { useSoundFx } from './hooks/useSoundFx'
+import { getTransitionPolicy } from './lib/motion'
 import type { SectionId } from './types'
 
 const HeroSection = lazy(() => import('./sections/HeroSection'))
@@ -29,13 +31,21 @@ function App() {
   const [activeSection, setActiveSection] = useState<SectionId>('hero')
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [bootDone, setBootDone] = useState(false)
+  const [showParticles, setShowParticles] = useState(true)
   const [pendingProjectId, setPendingProjectId] = useState<string | undefined>()
   const [pointer, setPointer] = useState({
     x: window.innerWidth / 2,
     y: window.innerHeight / 2,
   })
   const { unlocked, reset } = useEasterEgg()
+  const prefersReducedMotion = usePrefersReducedMotion()
+  const [reducedMotionEnabled, setReducedMotionEnabled] = useState(false)
   const soundFx = useSoundFx(false)
+  const transitionPolicy = getTransitionPolicy(reducedMotionEnabled)
+
+  useEffect(() => {
+    setReducedMotionEnabled(prefersReducedMotion)
+  }, [prefersReducedMotion])
 
   useEffect(() => {
     const bootTimer = window.setTimeout(() => setBootDone(true), 2800)
@@ -69,6 +79,8 @@ function App() {
       '4': () => setActiveSection('timeline'),
       '5': () => setActiveSection('skills'),
       m: () => soundFx.toggle(),
+      p: () => setShowParticles((prev) => !prev),
+      r: () => setReducedMotionEnabled((prev) => !prev),
       arrowright: () => {
         setActiveSection((prev) => {
           const current = sectionOrder.indexOf(prev)
@@ -85,12 +97,22 @@ function App() {
     [soundFx],
   )
 
+  useEffect(() => {
+    if (activeSection === 'hero') {
+      void import('./sections/ProjectsSection')
+    }
+    if (activeSection === 'projects') {
+      void import('./sections/CommandCenterSection')
+      void import('./sections/TimelineSection')
+    }
+  }, [activeSection])
+
   useKeyboardShortcuts(shortcuts)
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-abyss text-white">
-      <ParticleField />
-      <CustomCursor />
+      {showParticles && !reducedMotionEnabled ? <ParticleField /> : null}
+      {!reducedMotionEnabled ? <CustomCursor /> : null}
 
       <div className="pointer-events-none fixed inset-0 z-0 bg-noise opacity-90" />
       <div className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(circle_at_50%_120%,rgba(255,90,191,0.15),transparent_60%)]" />
@@ -99,10 +121,10 @@ function App() {
         <AnimatePresence mode="wait">
           <motion.div
             key={activeSection}
-            initial={{ opacity: 0, y: 24, filter: 'blur(10px)' }}
+            initial={{ opacity: 0, y: transitionPolicy.yOffset, filter: transitionPolicy.blur }}
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -20, filter: 'blur(8px)' }}
-            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            exit={{ opacity: 0, y: -transitionPolicy.yOffset, filter: transitionPolicy.blur }}
+            transition={{ duration: transitionPolicy.duration, ease: transitionPolicy.ease }}
           >
             <Suspense
               fallback={
@@ -139,7 +161,11 @@ function App() {
         onSelect={setActiveSection}
         onPalette={() => setPaletteOpen(true)}
         soundEnabled={soundFx.enabled}
+        particlesEnabled={showParticles}
+        reducedMotionEnabled={reducedMotionEnabled}
         onToggleSound={soundFx.toggle}
+        onToggleParticles={() => setShowParticles((prev) => !prev)}
+        onToggleReducedMotion={() => setReducedMotionEnabled((prev) => !prev)}
         onUiHover={soundFx.playHover}
         onUiClick={soundFx.playClick}
       />
@@ -155,6 +181,12 @@ function App() {
           setPendingProjectId(id)
           setActiveSection('projects')
         }}
+        soundEnabled={soundFx.enabled}
+        particlesEnabled={showParticles}
+        reducedMotionEnabled={reducedMotionEnabled}
+        onToggleSound={soundFx.toggle}
+        onToggleParticles={() => setShowParticles((prev) => !prev)}
+        onToggleReducedMotion={() => setReducedMotionEnabled((prev) => !prev)}
       />
 
       <AnimatePresence>
