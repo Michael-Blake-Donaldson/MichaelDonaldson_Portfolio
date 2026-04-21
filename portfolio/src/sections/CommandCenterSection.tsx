@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion'
 
 const widgets = [
-  { label: 'Build Velocity', value: '+38%', tone: 'from-neon/30 to-neon/5' },
-  { label: 'Incident Mean Time', value: '-27%', tone: 'from-arc/30 to-arc/5' },
-  { label: 'UX Satisfaction', value: '4.9/5', tone: 'from-plasma/30 to-plasma/5' },
-  { label: 'Ship Confidence', value: '92%', tone: 'from-white/20 to-white/5' },
+  { label: 'Current Academic Track', value: 'SNHU CS', tone: 'from-neon/30 to-neon/5' },
+  { label: 'Primary Focus', value: 'Software Engineering', tone: 'from-arc/30 to-arc/5' },
+  { label: 'Core Strength', value: 'Frontend and UX', tone: 'from-plasma/30 to-plasma/5' },
+  { label: 'Career Target', value: 'Intern / Junior SWE', tone: 'from-white/20 to-white/5' },
 ]
 
 export default function CommandCenterSection() {
@@ -17,7 +17,7 @@ export default function CommandCenterSection() {
       >
         <p className="text-xs uppercase tracking-[0.28em] text-neon/75">Command Center</p>
         <h2 className="mt-3 max-w-3xl font-display text-3xl text-white md:text-5xl">
-          A dashboard-grade view of engineering momentum and design impact.
+          A snapshot of current learning priorities and engineering growth goals.
         </h2>
       </motion.div>
 
@@ -45,23 +45,23 @@ export default function CommandCenterSection() {
         <p className="text-xs uppercase tracking-[0.2em] text-white/45">Current Focus Streams</p>
         <div className="mt-4 space-y-4">
           <div>
-            <p className="mb-2 text-sm text-white/75">Design Systems / Motion Tokens</p>
+            <p className="mb-2 text-sm text-white/75">Core CS Coursework and Fundamentals</p>
             <div className="h-2 rounded bg-white/10">
               <motion.div
                 className="h-full rounded bg-gradient-to-r from-neon to-arc"
                 initial={{ width: 0 }}
-                animate={{ width: '84%' }}
+                animate={{ width: '86%' }}
                 transition={{ delay: 0.35, duration: 1.1 }}
               />
             </div>
           </div>
           <div>
-            <p className="mb-2 text-sm text-white/75">AI Workflow Orchestration</p>
+            <p className="mb-2 text-sm text-white/75">Full-Stack Project Development</p>
             <div className="h-2 rounded bg-white/10">
               <motion.div
                 className="h-full rounded bg-gradient-to-r from-plasma to-neon"
                 initial={{ width: 0 }}
-                animate={{ width: '71%' }}
+                animate={{ width: '74%' }}
                 transition={{ delay: 0.42, duration: 1.1 }}
               />
             </div>

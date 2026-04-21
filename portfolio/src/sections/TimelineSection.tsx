@@ -56,7 +56,7 @@ export default function TimelineSection() {
       >
         <p className="text-xs uppercase tracking-[0.28em] text-neon/75">Flux Timeline</p>
         <h2 className="mt-3 max-w-3xl font-display text-3xl text-white md:text-5xl">
-          Milestones visualized as an animated progression through product eras.
+          Milestones across my transition from student learning to professional software engineering.
         </h2>
       </motion.div>
 

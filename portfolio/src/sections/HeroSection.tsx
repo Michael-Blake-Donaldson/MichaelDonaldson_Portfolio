@@ -18,9 +18,9 @@ export default function HeroSection({
   soundFx,
 }: HeroSectionProps) {
   const typed = useTypingEffect([
-    'Designing interfaces with cinematic intent.',
-    'Shipping products with engineering precision.',
-    'Crafting motion systems that feel alive.',
+    'Computer Science student at SNHU focused on software engineering.',
+    'Building practical full-stack projects with modern frontend tooling.',
+    'Seeking internship and junior SWE opportunities to grow fast.',
   ])
 
   const glareStyle = useMemo(() => {
@@ -56,7 +56,7 @@ export default function HeroSection({
       >
         Michael Donaldson
         <span className="block bg-gradient-to-r from-neon via-white to-plasma bg-clip-text text-transparent">
-          Product Engineer and Interaction Architect
+          SNHU Student and Aspiring Software Engineer
         </span>
       </motion.h1>
 
@@ -81,14 +81,14 @@ export default function HeroSection({
           onHoverSound={soundFx.playHover}
           onClickSound={soundFx.playClick}
         >
-          Enter Project Vault
+          Explore Projects
         </MagneticButton>
         <MagneticButton
           tone="ghost"
           onHoverSound={soundFx.playHover}
           onClickSound={soundFx.playClick}
         >
-          Download Signal Resume
+          View Resume Snapshot
         </MagneticButton>
       </motion.div>
 
@@ -100,9 +100,9 @@ export default function HeroSection({
       >
         <p className="text-xs uppercase tracking-[0.2em] text-white/45">Status</p>
         <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-white/80">
-          <span className="rounded-full border border-neon/25 bg-neon/10 px-3 py-1">Open to remote-first roles</span>
-          <span className="rounded-full border border-arc/30 bg-arc/10 px-3 py-1">Building interactive products</span>
-          <span className="rounded-full border border-plasma/30 bg-plasma/10 px-3 py-1">Focused on DX and platform UX</span>
+          <span className="rounded-full border border-neon/25 bg-neon/10 px-3 py-1">SNHU Computer Science Student</span>
+          <span className="rounded-full border border-arc/30 bg-arc/10 px-3 py-1">Open to internships and junior roles</span>
+          <span className="rounded-full border border-plasma/30 bg-plasma/10 px-3 py-1">Focused on frontend and full-stack growth</span>
         </div>
       </motion.div>
     </section>
