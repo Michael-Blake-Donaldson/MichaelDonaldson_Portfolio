@@ -49,7 +49,11 @@ npm run build
 - 1-5: jump to section
 - Left / Right arrows: cycle between sections
 - M: toggle sound effects
+- P: toggle particle field
+- R: toggle reduced motion mode
 - D (Project Vault): toggle incident simulation mode
+
+Command palette actions now include runtime toggles for sound, particles, and reduced-motion mode.
 
 ## Architecture Notes
 
