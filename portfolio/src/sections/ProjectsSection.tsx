@@ -204,38 +204,15 @@ export default function ProjectsSection({
   }, [])
 
   return (
-    <section ref={rootRef} className="relative min-h-[84vh] overflow-hidden px-6 pb-24 pt-16 md:px-14">
+    <section ref={rootRef} className="relative min-h-[84vh] overflow-x-hidden overflow-y-visible px-6 pb-24 pt-16 md:px-14">
       <p className="text-xs uppercase tracking-[0.28em] text-neon/75">Project Vault</p>
       <h2 className="mt-3 max-w-3xl font-display text-3xl text-white md:text-5xl">
         Scroll the engineering narrative: three flagship systems, each unpacked as a full product architecture.
       </h2>
 
-      <aside className="pointer-events-none fixed right-6 top-1/2 z-20 hidden w-56 -translate-y-1/2 rounded-2xl border border-white/15 bg-black/45 p-4 backdrop-blur-xl lg:block">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-neon/75">Scroll Progress</p>
-        <div className="mt-3 space-y-3">
-          {projects.map((project, index) => {
-            const progress = progressById[project.id] ?? 0
-            const isActive = project.id === activeProjectId
-            return (
-              <div key={`hud-${project.id}`}>
-                <div className={`text-[11px] uppercase tracking-[0.14em] ${isActive ? 'text-white' : 'text-white/50'}`}>
-                  {String(index + 1).padStart(2, '0')} {project.name}
-                </div>
-                <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-white/10">
-                  <motion.div
-                    className={`h-full ${isActive ? 'bg-gradient-to-r from-neon to-arc' : 'bg-white/35'}`}
-                    animate={{ width: `${Math.round(progress * 100)}%` }}
-                    transition={{ duration: 0.2 }}
-                  />
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </aside>
-
-      <div className="mt-10 space-y-24">
-        {projects.map((project, index) => (
+      <div className="mt-10 lg:grid lg:grid-cols-[minmax(0,1fr)_220px] lg:items-start lg:gap-8">
+        <div className="space-y-24">
+          {projects.map((project, index) => (
           <motion.article
             key={project.id}
             ref={(node) => {
@@ -360,7 +337,34 @@ export default function ProjectsSection({
               </div>
             </div>
           </motion.article>
-        ))}
+          ))}
+        </div>
+
+        <aside className="mt-8 hidden lg:sticky lg:top-24 lg:block lg:self-start">
+          <div className="pointer-events-none w-56 rounded-2xl border border-white/15 bg-black/45 p-4 backdrop-blur-xl">
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-neon/75">Scroll Progress</p>
+            <div className="mt-3 space-y-3">
+              {projects.map((project, index) => {
+                const progress = progressById[project.id] ?? 0
+                const isActive = project.id === activeProjectId
+                return (
+                  <div key={`hud-${project.id}`}>
+                    <div className={`text-[11px] uppercase tracking-[0.14em] ${isActive ? 'text-white' : 'text-white/50'}`}>
+                      {String(index + 1).padStart(2, '0')} {project.name}
+                    </div>
+                    <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-white/10">
+                      <motion.div
+                        className={`h-full ${isActive ? 'bg-gradient-to-r from-neon to-arc' : 'bg-white/35'}`}
+                        animate={{ width: `${Math.round(progress * 100)}%` }}
+                        transition={{ duration: 0.2 }}
+                      />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </aside>
       </div>
     </section>
   )
