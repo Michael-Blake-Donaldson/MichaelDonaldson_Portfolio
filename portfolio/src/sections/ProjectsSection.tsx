@@ -81,12 +81,15 @@ export default function ProjectsSection({
               soundFx.playHover()
               setHoverProjectId(project.id)
             }}
-          className="w-full overflow-hidden rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-left backdrop-blur-md transition hover:border-neon/40 hover:bg-neon/10"
+          className="group relative w-full overflow-hidden rounded-2xl border border-white/15 bg-[linear-gradient(120deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01))] px-4 py-3 text-left backdrop-blur-md transition hover:border-neon/40 hover:bg-neon/10"
         >
+          <span className="pointer-events-none absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-neon via-arc to-plasma opacity-55" />
           <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/45">
             {project.tags.join(' / ')}
           </p>
           <h3 className="mt-1 font-display text-xl text-white">{project.name}</h3>
+          <p className="mt-1 text-xs uppercase tracking-[0.18em] text-neon/70">System Overview</p>
+          <p className="mt-1 text-sm text-white/80">{project.overview}</p>
           <p className="mt-1 text-sm text-white/65">{project.headline}</p>
         </motion.button>
       )),
@@ -110,12 +113,14 @@ export default function ProjectsSection({
     <section ref={rootRef} className="relative min-h-[84vh] overflow-hidden px-6 pb-24 pt-16 md:px-14">
       <p className="text-xs uppercase tracking-[0.28em] text-neon/75">Project Vault</p>
       <h2 className="mt-3 max-w-3xl font-display text-3xl text-white md:text-5xl">
-        Tap a project signature to unfold a full-screen product experience.
+        Four production-style case studies with system architecture, tradeoffs, and engineering depth.
       </h2>
 
       <div className="project-atlas pointer-events-none absolute right-8 top-24 hidden w-[360px] rounded-3xl border border-white/15 bg-white/5 p-5 backdrop-blur-xl lg:block">
         <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-neon/75">Live Preview</p>
         <h3 className="mt-2 font-display text-2xl text-white">{previewProject.name}</h3>
+        <p className="mt-2 text-xs uppercase tracking-[0.2em] text-neon/60">Overview</p>
+        <p className="mt-1 text-sm text-white/80">{previewProject.overview}</p>
         <p className="mt-2 text-sm text-white/65">{previewProject.summary}</p>
         <div className="mt-5 rounded-2xl border border-white/15 bg-black/30 p-3">
           <div className="mb-2 flex items-center justify-between text-[10px] uppercase tracking-[0.15em] text-white/45">
@@ -177,6 +182,7 @@ export default function ProjectsSection({
                 <h3 className="mt-3 max-w-4xl font-display text-3xl text-white md:text-6xl">
                   {activeProject.headline}
                 </h3>
+                <p className="mt-4 max-w-4xl text-base text-white/90">{activeProject.overview}</p>
                 <p className="mt-5 max-w-3xl text-white/75">{activeProject.summary}</p>
 
                 <div className="mt-7 grid gap-3 md:grid-cols-3">
@@ -204,6 +210,92 @@ export default function ProjectsSection({
                 <p className="mt-6 text-xs uppercase tracking-[0.2em] text-plasma/85">
                   {activeProject.demoHint}
                 </p>
+
+                <div className="mt-10 grid gap-6 lg:grid-cols-2">
+                  <section className="rounded-2xl border border-white/15 bg-black/20 p-5">
+                    <p className="text-xs uppercase tracking-[0.2em] text-neon/75">Core Features</p>
+                    <ul className="mt-3 space-y-2 text-sm text-white/80">
+                      {activeProject.coreFeatures.map((feature) => (
+                        <li key={feature} className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+
+                  <section className="rounded-2xl border border-white/15 bg-black/20 p-5">
+                    <p className="text-xs uppercase tracking-[0.2em] text-neon/75">System Flow</p>
+                    <div className="mt-3 flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.15em] text-white/80">
+                      {activeProject.systemFlow.map((step, idx) => (
+                        <div key={step} className="contents">
+                          <span className="rounded-full border border-arc/40 bg-arc/10 px-3 py-1">{step}</span>
+                          {idx < activeProject.systemFlow.length - 1 ? (
+                            <span className="text-plasma/70">→</span>
+                          ) : null}
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                </div>
+
+                <div className="mt-6 grid gap-6 xl:grid-cols-2">
+                  <section className="rounded-2xl border border-white/15 bg-black/20 p-5">
+                    <p className="text-xs uppercase tracking-[0.2em] text-neon/75">Tech Stack</p>
+                    <div className="mt-3 space-y-3 text-sm text-white/80">
+                      <div>
+                        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/55">Backend</p>
+                        <p>{activeProject.techStack.backend.join(' • ')}</p>
+                      </div>
+                      <div>
+                        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/55">Frontend</p>
+                        <p>{activeProject.techStack.frontend.join(' • ')}</p>
+                      </div>
+                      <div>
+                        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/55">Database</p>
+                        <p>{activeProject.techStack.database.join(' • ')}</p>
+                      </div>
+                      <div>
+                        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/55">Other</p>
+                        <p>{activeProject.techStack.other.join(' • ')}</p>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="rounded-2xl border border-white/15 bg-black/20 p-5">
+                    <p className="text-xs uppercase tracking-[0.2em] text-neon/75">Architecture and Engineering Highlights</p>
+                    <ul className="mt-3 space-y-2 text-sm text-white/80">
+                      {activeProject.architectureHighlights.map((item) => (
+                        <li key={item} className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                </div>
+
+                <div className="mt-6 grid gap-6 xl:grid-cols-2">
+                  <section className="rounded-2xl border border-white/15 bg-black/20 p-5">
+                    <p className="text-xs uppercase tracking-[0.2em] text-neon/75">Challenges Solved</p>
+                    <ul className="mt-3 space-y-2 text-sm text-white/80">
+                      {activeProject.challengesSolved.map((item) => (
+                        <li key={item} className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+
+                  <section className="rounded-2xl border border-white/15 bg-black/20 p-5">
+                    <p className="text-xs uppercase tracking-[0.2em] text-neon/75">Why It Is Impressive</p>
+                    <ul className="mt-3 space-y-2 text-sm text-white/80">
+                      {activeProject.whyImpressive.map((item) => (
+                        <li key={item} className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                </div>
 
                 <div className="mt-6 rounded-xl border border-neon/25 bg-neon/10 p-3 text-xs uppercase tracking-[0.18em] text-neon">
                   Press D to toggle incident simulation overlay.

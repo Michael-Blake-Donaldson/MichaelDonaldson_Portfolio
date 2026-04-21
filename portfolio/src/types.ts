@@ -8,8 +8,20 @@ export type SectionId =
 export type ProjectItem = {
   id: string
   name: string
+  overview: string
   headline: string
   summary: string
+  coreFeatures: string[]
+  techStack: {
+    backend: string[]
+    frontend: string[]
+    database: string[]
+    other: string[]
+  }
+  architectureHighlights: string[]
+  challengesSolved: string[]
+  whyImpressive: string[]
+  systemFlow: string[]
   stack: string[]
   tags: string[]
   metrics: string[]
