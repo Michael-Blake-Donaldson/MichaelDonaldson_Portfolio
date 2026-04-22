@@ -6,6 +6,102 @@ import { timelineEvents } from '../data/siteData'
 
 gsap.registerPlugin(ScrollTrigger)
 
+type PlanetTheme = {
+  orbGradient: string
+  glow: string
+  ringOuter: string
+  ringInner: string
+  craterA: string
+  craterB: string
+  craterC: string
+  progress: string
+  chip: string
+}
+
+function getPlanetTheme(company: string, index: number): PlanetTheme {
+  const normalized = company.toLowerCase()
+
+  if (normalized.includes('unscripted')) {
+    return {
+      orbGradient: 'from-cyan-300/35 via-sky-400/20 to-blue-500/10',
+      glow: 'shadow-[0_0_65px_rgba(34,211,238,0.34)]',
+      ringOuter: 'border-cyan-200/45',
+      ringInner: 'border-cyan-100/20',
+      craterA: 'bg-cyan-100/60',
+      craterB: 'bg-cyan-300/25',
+      craterC: 'bg-cyan-900/28',
+      progress: 'from-cyan-300 via-sky-400 to-blue-400',
+      chip: 'text-cyan-200',
+    }
+  }
+
+  if (normalized.includes('target')) {
+    return {
+      orbGradient: 'from-rose-300/35 via-red-400/22 to-rose-700/12',
+      glow: 'shadow-[0_0_70px_rgba(248,113,113,0.3)]',
+      ringOuter: 'border-rose-200/40',
+      ringInner: 'border-rose-100/20',
+      craterA: 'bg-rose-100/55',
+      craterB: 'bg-red-300/24',
+      craterC: 'bg-rose-900/30',
+      progress: 'from-rose-300 via-red-400 to-orange-300',
+      chip: 'text-rose-200',
+    }
+  }
+
+  if (normalized.includes('disney')) {
+    return {
+      orbGradient: 'from-indigo-300/35 via-violet-400/22 to-blue-700/14',
+      glow: 'shadow-[0_0_70px_rgba(129,140,248,0.32)]',
+      ringOuter: 'border-indigo-200/40',
+      ringInner: 'border-indigo-100/20',
+      craterA: 'bg-indigo-100/58',
+      craterB: 'bg-violet-300/22',
+      craterC: 'bg-indigo-900/30',
+      progress: 'from-indigo-300 via-violet-400 to-blue-400',
+      chip: 'text-indigo-200',
+    }
+  }
+
+  if (normalized.includes("arby's") || normalized.includes('arbys')) {
+    return {
+      orbGradient: 'from-amber-300/36 via-orange-400/24 to-red-600/14',
+      glow: 'shadow-[0_0_72px_rgba(251,146,60,0.33)]',
+      ringOuter: 'border-amber-100/42',
+      ringInner: 'border-amber-100/20',
+      craterA: 'bg-amber-100/58',
+      craterB: 'bg-orange-300/24',
+      craterC: 'bg-orange-900/30',
+      progress: 'from-amber-300 via-orange-400 to-red-400',
+      chip: 'text-amber-200',
+    }
+  }
+
+  return index % 2 === 0
+    ? {
+      orbGradient: 'from-neon/30 via-arc/15 to-transparent',
+      glow: 'shadow-[0_0_55px_rgba(88,246,210,0.22)]',
+      ringOuter: 'border-white/25',
+      ringInner: 'border-white/10',
+      craterA: 'bg-white/50',
+      craterB: 'bg-white/15',
+      craterC: 'bg-black/20',
+      progress: 'from-neon via-arc to-plasma',
+      chip: 'text-neon/80',
+    }
+    : {
+      orbGradient: 'from-plasma/30 via-arc/20 to-transparent',
+      glow: 'shadow-[0_0_55px_rgba(255,90,191,0.22)]',
+      ringOuter: 'border-white/25',
+      ringInner: 'border-white/10',
+      craterA: 'bg-white/50',
+      craterB: 'bg-white/15',
+      craterC: 'bg-black/20',
+      progress: 'from-neon via-arc to-plasma',
+      chip: 'text-neon/80',
+    }
+}
+
 export default function TimelineSection() {
   const rootRef = useRef<HTMLDivElement | null>(null)
 
@@ -112,9 +208,7 @@ export default function TimelineSection() {
       <div className="space-y-24">
         {timelineEvents.map((item, index) => {
           const isEven = index % 2 === 0
-          const palette = isEven
-            ? 'from-neon/30 via-arc/15 to-transparent'
-            : 'from-plasma/30 via-arc/20 to-transparent'
+          const theme = getPlanetTheme(item.company, index)
 
           return (
             <article
@@ -123,18 +217,18 @@ export default function TimelineSection() {
             >
               <div className={isEven ? 'order-1' : 'order-1 lg:order-2'}>
                 <div className="planet-orb relative mx-auto w-[min(84vw,460px)]">
-                  <div className={`aspect-square rounded-full border border-white/15 bg-gradient-to-br ${palette} shadow-[0_0_55px_rgba(88,246,210,0.22)]`} />
-                  <div className="planet-ring absolute inset-[11%] rounded-full border border-white/25" />
-                  <div className="absolute inset-[22%] rounded-full border border-white/10" />
-                  <div className="absolute left-[16%] top-[18%] h-5 w-5 rounded-full bg-white/50 blur-[1px]" />
-                  <div className="absolute right-[20%] top-[32%] h-8 w-8 rounded-full bg-white/15" />
-                  <div className="absolute bottom-[21%] left-[27%] h-10 w-10 rounded-full bg-black/20" />
+                  <div className={`aspect-square rounded-full border border-white/15 bg-gradient-to-br ${theme.orbGradient} ${theme.glow}`} />
+                  <div className={`planet-ring absolute inset-[11%] rounded-full border ${theme.ringOuter}`} />
+                  <div className={`absolute inset-[22%] rounded-full border ${theme.ringInner}`} />
+                  <div className={`absolute left-[16%] top-[18%] h-5 w-5 rounded-full ${theme.craterA} blur-[1px]`} />
+                  <div className={`absolute right-[20%] top-[32%] h-8 w-8 rounded-full ${theme.craterB}`} />
+                  <div className={`absolute bottom-[21%] left-[27%] h-10 w-10 rounded-full ${theme.craterC}`} />
                 </div>
               </div>
 
               <div className={isEven ? 'order-2' : 'order-2 lg:order-1'}>
                 <div className="planet-card rounded-[1.6rem] border border-white/15 bg-black/40 p-6 backdrop-blur-xl md:p-8">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-neon/80">
+                  <p className={`font-mono text-[11px] uppercase tracking-[0.24em] ${theme.chip}`}>
                     {item.planet} • {item.year}
                   </p>
                   <h3 className="mt-3 font-display text-2xl text-white md:text-3xl">{item.title}</h3>
@@ -153,7 +247,7 @@ export default function TimelineSection() {
                   </ul>
                   <div className="mt-6 h-1.5 overflow-hidden rounded-full border border-white/10 bg-white/10">
                     <div
-                      className="h-full bg-gradient-to-r from-neon via-arc to-plasma"
+                      className={`h-full bg-gradient-to-r ${theme.progress}`}
                       style={{ width: `${Math.min(98, 56 + index * 12)}%` }}
                     />
                   </div>
