@@ -14,26 +14,69 @@ export default function TimelineSection() {
     if (!root) return
 
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        '.timeline-event',
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          stagger: 0.16,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: root,
-            start: 'top 70%',
-            end: 'bottom 60%',
-            scrub: 0.4,
-          },
-        },
-      )
+      gsap.utils.toArray<HTMLElement>('.planet-chapter').forEach((node, index) => {
+        const orb = node.querySelector('.planet-orb')
+        const ring = node.querySelector('.planet-ring')
+        const card = node.querySelector('.planet-card')
 
-      gsap.to('.timeline-track', {
-        backgroundPositionY: 220,
+        if (orb) {
+          gsap.fromTo(
+            orb,
+            { yPercent: -18, scale: 0.9, rotate: -6 },
+            {
+              yPercent: 16,
+              scale: 1.08,
+              rotate: 6,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: node,
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: true,
+              },
+            },
+          )
+        }
+
+        if (ring) {
+          gsap.fromTo(
+            ring,
+            { rotate: index % 2 === 0 ? 8 : -8 },
+            {
+              rotate: index % 2 === 0 ? -18 : 18,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: node,
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: true,
+              },
+            },
+          )
+        }
+
+        if (card) {
+          gsap.fromTo(
+            card,
+            { opacity: 0, y: 48 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.85,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: node,
+                start: 'top 72%',
+                end: 'top 40%',
+                scrub: 0.4,
+              },
+            },
+          )
+        }
+      })
+
+      gsap.to('.timeline-cosmos', {
+        backgroundPositionY: 260,
         ease: 'none',
         scrollTrigger: {
           trigger: root,
@@ -48,7 +91,10 @@ export default function TimelineSection() {
   }, [])
 
   return (
-    <section ref={rootRef} className="relative min-h-[84vh] overflow-hidden px-6 pb-28 pt-16 md:px-14">
+    <section ref={rootRef} className="timeline-cosmos relative min-h-[84vh] overflow-hidden px-6 pb-28 pt-16 md:px-14">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_22%,rgba(88,246,210,0.16),transparent_36%),radial-gradient(circle_at_80%_16%,rgba(255,90,191,0.14),transparent_38%),radial-gradient(circle_at_58%_72%,rgba(106,166,255,0.2),transparent_42%)]" />
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(rgba(255,255,255,0.14)_0.7px,transparent_0.8px)] [background-size:20px_20px] opacity-35" />
+
       <motion.div
         className="mb-12"
         initial={{ opacity: 0, y: 12 }}
@@ -56,23 +102,51 @@ export default function TimelineSection() {
       >
         <p className="text-xs uppercase tracking-[0.28em] text-neon/75">Flux Timeline</p>
         <h2 className="mt-3 max-w-3xl font-display text-3xl text-white md:text-5xl">
-          Milestones across my transition from student learning to professional software engineering.
+          Descend through the career system: each planet marks a role in my engineering journey.
         </h2>
       </motion.div>
 
-      <div className="timeline-track relative rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(88,246,210,0.08),rgba(106,166,255,0.08))] p-6 md:p-8">
-        <div className="space-y-6">
-          {timelineEvents.map((item) => (
+      <div className="space-y-24">
+        {timelineEvents.map((item, index) => {
+          const isEven = index % 2 === 0
+          const palette = isEven
+            ? 'from-neon/30 via-arc/15 to-transparent'
+            : 'from-plasma/30 via-arc/20 to-transparent'
+
+          return (
             <article
-              key={item.year}
-              className="timeline-event relative overflow-hidden rounded-2xl border border-white/10 bg-black/35 p-5 backdrop-blur-lg"
+              key={`${item.year}-${item.title}`}
+              className="planet-chapter grid min-h-[88vh] items-center gap-10 lg:grid-cols-[0.95fr_1.05fr]"
             >
-              <p className="font-mono text-xs uppercase tracking-[0.2em] text-neon/75">{item.year}</p>
-              <h3 className="mt-2 font-display text-xl text-white">{item.title}</h3>
-              <p className="mt-2 text-sm text-white/70">{item.detail}</p>
+              <div className={isEven ? 'order-1' : 'order-1 lg:order-2'}>
+                <div className="planet-orb relative mx-auto w-[min(84vw,460px)]">
+                  <div className={`aspect-square rounded-full border border-white/15 bg-gradient-to-br ${palette} shadow-[0_0_55px_rgba(88,246,210,0.22)]`} />
+                  <div className="planet-ring absolute inset-[11%] rounded-full border border-white/25" />
+                  <div className="absolute inset-[22%] rounded-full border border-white/10" />
+                  <div className="absolute left-[16%] top-[18%] h-5 w-5 rounded-full bg-white/50 blur-[1px]" />
+                  <div className="absolute right-[20%] top-[32%] h-8 w-8 rounded-full bg-white/15" />
+                  <div className="absolute bottom-[21%] left-[27%] h-10 w-10 rounded-full bg-black/20" />
+                </div>
+              </div>
+
+              <div className={isEven ? 'order-2' : 'order-2 lg:order-1'}>
+                <div className="planet-card rounded-[1.6rem] border border-white/15 bg-black/40 p-6 backdrop-blur-xl md:p-8">
+                  <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-neon/80">
+                    Orbital Window {String(index + 1).padStart(2, '0')} • {item.year}
+                  </p>
+                  <h3 className="mt-3 font-display text-2xl text-white md:text-3xl">{item.title}</h3>
+                  <p className="mt-4 max-w-xl text-base leading-relaxed text-white/75">{item.detail}</p>
+                  <div className="mt-6 h-1.5 overflow-hidden rounded-full border border-white/10 bg-white/10">
+                    <div
+                      className="h-full bg-gradient-to-r from-neon via-arc to-plasma"
+                      style={{ width: `${Math.min(98, 56 + index * 12)}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
             </article>
-          ))}
-        </div>
+          )
+        })}
       </div>
     </section>
   )
