@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -14,10 +14,6 @@ type ProjectsSectionProps = {
     playHover: () => void
     playClick: () => void
   }
-}
-
-function clamp(value: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, value))
 }
 
 function ArchitectureFlowDiagram({ project }: { project: ProjectItem }) {
@@ -103,8 +99,6 @@ export default function ProjectsSection({
 }: ProjectsSectionProps) {
   const rootRef = useRef<HTMLElement | null>(null)
   const chapterRefs = useRef<Record<string, HTMLElement | null>>({})
-  const [progressById, setProgressById] = useState<Record<string, number>>({})
-  const [activeProjectId, setActiveProjectId] = useState(projects[0]?.id ?? '')
 
   useLayoutEffect(() => {
     const root = rootRef.current
@@ -161,49 +155,6 @@ export default function ProjectsSection({
     clearInitialProject()
   }, [initialProjectId, clearInitialProject])
 
-  useEffect(() => {
-    let rafId = 0
-
-    const updateProgress = () => {
-      if (rafId) return
-      rafId = window.requestAnimationFrame(() => {
-        const nextProgress: Record<string, number> = {}
-        let nearestId = projects[0]?.id ?? ''
-        let nearestDistance = Number.POSITIVE_INFINITY
-
-        for (const project of projects) {
-          const node = chapterRefs.current[project.id]
-          if (!node) continue
-
-          const rect = node.getBoundingClientRect()
-          const rawProgress = (window.innerHeight - rect.top) / (rect.height + window.innerHeight)
-          nextProgress[project.id] = clamp(rawProgress, 0, 1)
-
-          const chapterCenter = rect.top + rect.height / 2
-          const distanceToFocusLine = Math.abs(chapterCenter - window.innerHeight * 0.45)
-          if (rect.bottom > 0 && rect.top < window.innerHeight && distanceToFocusLine < nearestDistance) {
-            nearestDistance = distanceToFocusLine
-            nearestId = project.id
-          }
-        }
-
-        setProgressById(nextProgress)
-        setActiveProjectId(nearestId)
-        rafId = 0
-      })
-    }
-
-    updateProgress()
-    window.addEventListener('scroll', updateProgress, { passive: true })
-    window.addEventListener('resize', updateProgress)
-
-    return () => {
-      window.removeEventListener('scroll', updateProgress)
-      window.removeEventListener('resize', updateProgress)
-      if (rafId) window.cancelAnimationFrame(rafId)
-    }
-  }, [])
-
   return (
     <section ref={rootRef} className="relative min-h-[84vh] overflow-visible px-6 pb-24 pt-16 md:px-14">
       <p className="text-xs uppercase tracking-[0.28em] text-neon/75">Project Vault</p>
@@ -211,9 +162,8 @@ export default function ProjectsSection({
         Scroll the engineering narrative: three flagship systems, each unpacked as a full product architecture.
       </h2>
 
-      <div className="mt-10 lg:grid lg:grid-cols-[minmax(0,1fr)_232px] lg:items-start lg:gap-8">
-        <div className="space-y-24">
-          {projects.map((project, index) => (
+      <div className="mt-10 space-y-24">
+        {projects.map((project, index) => (
           <motion.article
             key={project.id}
             ref={(node) => {
@@ -339,43 +289,7 @@ export default function ProjectsSection({
               </div>
             </div>
           </motion.article>
-          ))}
-        </div>
-
-        <aside className="mt-8 hidden lg:block lg:self-start">
-          <div className="lg:sticky lg:top-24">
-            <div className="w-full overflow-hidden rounded-2xl border border-white/15 bg-black/45 p-4 backdrop-blur-xl">
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-neon/75">Scroll Progress</p>
-            <div className="mt-3 space-y-3">
-              {projects.map((project, index) => {
-                const progress = progressById[project.id] ?? 0
-                const isActive = project.id === activeProjectId
-                const displayProgress = Math.max(
-                  progress,
-                  isActive ? 0.05 : 0.02,
-                )
-                return (
-                  <div key={`hud-${project.id}`} className="pb-0.5">
-                    <div
-                      className={`truncate text-[11px] uppercase tracking-[0.12em] ${isActive ? 'text-white' : 'text-white/50'}`}
-                      title={`${String(index + 1).padStart(2, '0')} ${project.name}`}
-                    >
-                      {String(index + 1).padStart(2, '0')} {project.name}
-                    </div>
-                    <div className="mt-1 h-1.5 overflow-hidden rounded-full border border-white/10 bg-white/20">
-                      <motion.div
-                        className={`h-full ${isActive ? 'bg-gradient-to-r from-neon to-arc' : 'bg-white/35'}`}
-                        animate={{ width: `${Math.round(displayProgress * 100)}%` }}
-                        transition={{ duration: 0.2 }}
-                      />
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-            </div>
-          </div>
-        </aside>
+        ))}
       </div>
     </section>
   )
