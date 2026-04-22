@@ -204,7 +204,7 @@ export default function ProjectsSection({
   }, [])
 
   return (
-    <section ref={rootRef} className="relative min-h-[84vh] overflow-x-hidden overflow-y-visible px-6 pb-24 pt-16 md:px-14">
+    <section ref={rootRef} className="relative min-h-[84vh] overflow-visible px-6 pb-24 pt-16 md:px-14">
       <p className="text-xs uppercase tracking-[0.28em] text-neon/75">Project Vault</p>
       <h2 className="mt-3 max-w-3xl font-display text-3xl text-white md:text-5xl">
         Scroll the engineering narrative: three flagship systems, each unpacked as a full product architecture.
