@@ -224,7 +224,7 @@ export default function ProjectsSection({
         Scroll the engineering narrative: three flagship systems, each unpacked as a full product architecture.
       </h2>
 
-      <div className="mt-10 lg:grid lg:grid-cols-[minmax(0,1fr)_220px] lg:items-start lg:gap-8">
+      <div className="mt-10 lg:grid lg:grid-cols-[minmax(0,1fr)_232px] lg:items-start lg:gap-8">
         <div className="space-y-24">
           {projects.map((project, index) => (
           <motion.article
@@ -358,7 +358,7 @@ export default function ProjectsSection({
         <aside className="mt-8 hidden lg:block lg:self-start">
           <div
             ref={progressRailRef}
-            className="pointer-events-none w-56 rounded-2xl border border-white/15 bg-black/45 p-4 backdrop-blur-xl"
+            className="pointer-events-none w-full overflow-hidden rounded-2xl border border-white/15 bg-black/45 p-4 backdrop-blur-xl"
           >
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-neon/75">Scroll Progress</p>
             <div className="mt-3 space-y-3">
@@ -367,7 +367,10 @@ export default function ProjectsSection({
                 const isActive = project.id === activeProjectId
                 return (
                   <div key={`hud-${project.id}`}>
-                    <div className={`text-[11px] uppercase tracking-[0.14em] ${isActive ? 'text-white' : 'text-white/50'}`}>
+                    <div
+                      className={`truncate text-[11px] uppercase tracking-[0.12em] ${isActive ? 'text-white' : 'text-white/50'}`}
+                      title={`${String(index + 1).padStart(2, '0')} ${project.name}`}
+                    >
                       {String(index + 1).padStart(2, '0')} {project.name}
                     </div>
                     <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-white/10">
