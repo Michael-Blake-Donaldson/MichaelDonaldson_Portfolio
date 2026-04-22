@@ -117,7 +117,7 @@ function App() {
       <div className="pointer-events-none fixed inset-0 z-0 bg-noise opacity-90" />
       <div className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(circle_at_50%_120%,rgba(255,90,191,0.15),transparent_60%)]" />
 
-      <main className="relative z-10 mx-auto w-full max-w-[1280px] px-2 pb-28 md:px-6">
+      <main className="relative z-10 mx-auto w-full max-w-[1280px] px-2 pb-44 sm:pb-40 md:px-6 md:pb-36">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeSection}
