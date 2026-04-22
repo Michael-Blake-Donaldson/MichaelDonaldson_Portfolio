@@ -365,18 +365,22 @@ export default function ProjectsSection({
               {projects.map((project, index) => {
                 const progress = progressById[project.id] ?? 0
                 const isActive = project.id === activeProjectId
+                const displayProgress = Math.max(
+                  progress,
+                  isActive ? 0.05 : 0.02,
+                )
                 return (
-                  <div key={`hud-${project.id}`}>
+                  <div key={`hud-${project.id}`} className="pb-0.5">
                     <div
                       className={`truncate text-[11px] uppercase tracking-[0.12em] ${isActive ? 'text-white' : 'text-white/50'}`}
                       title={`${String(index + 1).padStart(2, '0')} ${project.name}`}
                     >
                       {String(index + 1).padStart(2, '0')} {project.name}
                     </div>
-                    <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-white/10">
+                    <div className="mt-1 h-1.5 overflow-hidden rounded-full border border-white/10 bg-white/20">
                       <motion.div
                         className={`h-full ${isActive ? 'bg-gradient-to-r from-neon to-arc' : 'bg-white/35'}`}
-                        animate={{ width: `${Math.round(progress * 100)}%` }}
+                        animate={{ width: `${Math.round(displayProgress * 100)}%` }}
                         transition={{ duration: 0.2 }}
                       />
                     </div>
