@@ -38,8 +38,8 @@ export function CustomCursor() {
 
   return (
     <>
-      <div ref={ringRef} className="pointer-events-none fixed left-0 top-0 z-50 hidden h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full border border-neon/50 mix-blend-screen md:block" />
-      <div ref={cursorRef} className="pointer-events-none fixed left-0 top-0 z-50 hidden h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-neon shadow-glow md:block" />
+      <div ref={ringRef} className="pointer-events-none fixed left-0 top-0 z-[70] hidden h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full border border-neon/50 mix-blend-screen md:block" />
+      <div ref={cursorRef} className="pointer-events-none fixed left-0 top-0 z-[70] hidden h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-neon shadow-glow md:block" />
     </>
   )
 }
