@@ -35,3 +35,39 @@ export type NavItem = {
   label: string
   shortcut: string
 }
+
+export type GridConnectionType = 'strong' | 'weak' | 'indirect'
+
+export type PowerGridProject = {
+  id: string
+  name: string
+  description: string
+  powerOutput: number
+  color: string
+  connectedSkills: string[]
+}
+
+export type PowerGridSkill = {
+  id: string
+  name: string
+  category: 'frontend' | 'backend' | 'system' | 'platform' | 'data' | 'quality'
+  strength: number
+  connections: string[]
+  relatedProjects: string[]
+  description: string
+  impact: {
+    scalability: number
+    decomposition: number
+    architecture: number
+    performance: number
+  }
+  x: number
+  y: number
+}
+
+export type PowerGridConnection = {
+  sourceSkillId: string
+  targetSkillId: string
+  weight: number
+  type: GridConnectionType
+}
