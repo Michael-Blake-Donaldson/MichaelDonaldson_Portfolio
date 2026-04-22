@@ -103,9 +103,9 @@ export default function ProjectsSection({
 }: ProjectsSectionProps) {
   const rootRef = useRef<HTMLElement | null>(null)
   const chapterRefs = useRef<Record<string, HTMLElement | null>>({})
-  const progressRailRef = useRef<HTMLDivElement | null>(null)
   const [progressById, setProgressById] = useState<Record<string, number>>({})
   const [activeProjectId, setActiveProjectId] = useState(projects[0]?.id ?? '')
+  const [railStatus, setRailStatus] = useState<'tracking' | 'idle'>('idle')
 
   useLayoutEffect(() => {
     const root = rootRef.current
@@ -149,18 +149,6 @@ export default function ProjectsSection({
         )
       })
 
-      if (progressRailRef.current) {
-        ScrollTrigger.create({
-          trigger: root,
-          start: 'top top+=96',
-          end: () => `+=${Math.max(root.scrollHeight - window.innerHeight - 120, 300)}`,
-          pin: progressRailRef.current,
-          pinSpacing: true,
-          pinReparent: true,
-          invalidateOnRefresh: true,
-          anticipatePin: 1,
-        })
-      }
     }, root)
 
     return () => ctx.revert()
@@ -183,6 +171,12 @@ export default function ProjectsSection({
         const nextProgress: Record<string, number> = {}
         let nearestId = projects[0]?.id ?? ''
         let nearestDistance = Number.POSITIVE_INFINITY
+        const root = rootRef.current
+        if (root) {
+          const sectionRect = root.getBoundingClientRect()
+          const inRange = sectionRect.top <= 120 && sectionRect.bottom >= 220
+          setRailStatus(inRange ? 'tracking' : 'idle')
+        }
 
         for (const project of projects) {
           const node = chapterRefs.current[project.id]
@@ -355,12 +349,14 @@ export default function ProjectsSection({
           ))}
         </div>
 
-        <aside className="mt-8 hidden lg:block lg:self-start">
+        <aside className="mt-8 hidden lg:sticky lg:top-24 lg:block lg:self-start">
           <div
-            ref={progressRailRef}
             className="pointer-events-none w-full overflow-hidden rounded-2xl border border-white/15 bg-black/45 p-4 backdrop-blur-xl"
           >
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-neon/75">Scroll Progress</p>
+            <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.16em] text-white/40">
+              Rail status: {railStatus}
+            </p>
             <div className="mt-3 space-y-3">
               {projects.map((project, index) => {
                 const progress = progressById[project.id] ?? 0
