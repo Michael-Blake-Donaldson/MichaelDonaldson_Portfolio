@@ -153,9 +153,12 @@ export default function ProjectsSection({
         ScrollTrigger.create({
           trigger: root,
           start: 'top top+=96',
-          end: 'bottom bottom-=64',
+          end: () => `+=${Math.max(root.scrollHeight - window.innerHeight - 120, 300)}`,
           pin: progressRailRef.current,
-          pinSpacing: false,
+          pinSpacing: true,
+          pinReparent: true,
+          invalidateOnRefresh: true,
+          anticipatePin: 1,
         })
       }
     }, root)
@@ -243,6 +246,7 @@ export default function ProjectsSection({
                     alt={`${project.name} screenshot`}
                     className="h-full w-full object-cover opacity-90"
                     loading="lazy"
+                    onLoad={() => ScrollTrigger.refresh()}
                   />
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/10" />
                   <div className="absolute bottom-4 left-4 right-4 rounded-xl border border-white/20 bg-black/45 p-3 backdrop-blur-sm">
