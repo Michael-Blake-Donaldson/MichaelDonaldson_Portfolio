@@ -105,7 +105,6 @@ export default function ProjectsSection({
   const chapterRefs = useRef<Record<string, HTMLElement | null>>({})
   const [progressById, setProgressById] = useState<Record<string, number>>({})
   const [activeProjectId, setActiveProjectId] = useState(projects[0]?.id ?? '')
-  const [railStatus, setRailStatus] = useState<'tracking' | 'idle'>('idle')
 
   useLayoutEffect(() => {
     const root = rootRef.current
@@ -171,12 +170,6 @@ export default function ProjectsSection({
         const nextProgress: Record<string, number> = {}
         let nearestId = projects[0]?.id ?? ''
         let nearestDistance = Number.POSITIVE_INFINITY
-        const root = rootRef.current
-        if (root) {
-          const sectionRect = root.getBoundingClientRect()
-          const inRange = sectionRect.top <= window.innerHeight - 120 && sectionRect.bottom >= 140
-          setRailStatus(inRange ? 'tracking' : 'idle')
-        }
 
         for (const project of projects) {
           const node = chapterRefs.current[project.id]
@@ -349,19 +342,10 @@ export default function ProjectsSection({
           ))}
         </div>
 
-        <aside className="mt-8 hidden lg:block lg:self-start" aria-hidden="true">
-          <div className="w-full opacity-0">placeholder rail spacing</div>
-        </aside>
-
-        <aside
-          className={`pointer-events-none fixed right-[max(1.5rem,calc((100vw-1280px)/2+1.5rem))] top-24 z-30 hidden w-[232px] transition-opacity duration-300 lg:block ${railStatus === 'tracking' ? 'opacity-100' : 'opacity-0'}`}
-          aria-hidden="true"
-        >
-          <div className="w-full overflow-hidden rounded-2xl border border-white/15 bg-black/45 p-4 backdrop-blur-xl">
+        <aside className="mt-8 hidden lg:block lg:self-start">
+          <div className="lg:sticky lg:top-24">
+            <div className="w-full overflow-hidden rounded-2xl border border-white/15 bg-black/45 p-4 backdrop-blur-xl">
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-neon/75">Scroll Progress</p>
-            <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.16em] text-white/40">
-              Rail status: {railStatus}
-            </p>
             <div className="mt-3 space-y-3">
               {projects.map((project, index) => {
                 const progress = progressById[project.id] ?? 0
@@ -388,6 +372,7 @@ export default function ProjectsSection({
                   </div>
                 )
               })}
+            </div>
             </div>
           </div>
         </aside>
