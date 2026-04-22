@@ -264,8 +264,8 @@ export const powerGridSkills: PowerGridSkill[] = [
     relatedProjects: ['earth-3d-dashboard', 'plant-haven'],
     description: 'Core language for interactive UI systems, async flows, and complex client state behavior.',
     impact: { scalability: 88, decomposition: 91, architecture: 90, performance: 87 },
-    x: 20,
-    y: 18,
+    x: 18,
+    y: 14,
   },
   {
     id: 'typescript',
@@ -277,7 +277,7 @@ export const powerGridSkills: PowerGridSkill[] = [
     description: 'Type-safe design for large UI systems and maintainable architecture boundaries.',
     impact: { scalability: 90, decomposition: 92, architecture: 91, performance: 84 },
     x: 50,
-    y: 18,
+    y: 14,
   },
   {
     id: 'python',
@@ -288,8 +288,8 @@ export const powerGridSkills: PowerGridSkill[] = [
     relatedProjects: ['drastic-planner'],
     description: 'Backend and simulation logic development with clear domain modeling and modular services.',
     impact: { scalability: 84, decomposition: 89, architecture: 90, performance: 82 },
-    x: 80,
-    y: 18,
+    x: 82,
+    y: 14,
   },
   {
     id: 'react',
@@ -300,8 +300,8 @@ export const powerGridSkills: PowerGridSkill[] = [
     relatedProjects: ['earth-3d-dashboard', 'plant-haven'],
     description: 'Component system design, state composition, and interactive UX engineering.',
     impact: { scalability: 91, decomposition: 92, architecture: 93, performance: 88 },
-    x: 28,
-    y: 42,
+    x: 24,
+    y: 38,
   },
   {
     id: 'system-design',
@@ -313,7 +313,7 @@ export const powerGridSkills: PowerGridSkill[] = [
     description: 'Architecting scalable, maintainable systems with explicit tradeoffs and operational resilience.',
     impact: { scalability: 95, decomposition: 92, architecture: 96, performance: 90 },
     x: 50,
-    y: 42,
+    y: 38,
   },
   {
     id: 'data-modeling',
@@ -324,8 +324,8 @@ export const powerGridSkills: PowerGridSkill[] = [
     relatedProjects: ['drastic-planner', 'earth-3d-dashboard'],
     description: 'Structured data design for simulation, analytics, and production data lifecycles.',
     impact: { scalability: 88, decomposition: 87, architecture: 90, performance: 86 },
-    x: 80,
-    y: 42,
+    x: 76,
+    y: 38,
   },
   {
     id: 'websockets',
@@ -336,8 +336,8 @@ export const powerGridSkills: PowerGridSkill[] = [
     relatedProjects: ['earth-3d-dashboard'],
     description: 'Realtime event pipelines for live UI feedback and system telemetry flows.',
     impact: { scalability: 82, decomposition: 84, architecture: 85, performance: 84 },
-    x: 20,
-    y: 66,
+    x: 18,
+    y: 62,
   },
   {
     id: 'apis',
@@ -349,7 +349,7 @@ export const powerGridSkills: PowerGridSkill[] = [
     description: 'Designing service contracts, integration boundaries, and reliable network workflows.',
     impact: { scalability: 90, decomposition: 89, architecture: 91, performance: 88 },
     x: 50,
-    y: 66,
+    y: 62,
   },
   {
     id: 'databases',
@@ -360,8 +360,8 @@ export const powerGridSkills: PowerGridSkill[] = [
     relatedProjects: ['drastic-planner', 'plant-haven'],
     description: 'Data persistence strategies focused on consistency, query paths, and system reliability.',
     impact: { scalability: 90, decomposition: 87, architecture: 89, performance: 88 },
-    x: 80,
-    y: 66,
+    x: 82,
+    y: 62,
   },
   {
     id: 'ux-design',
@@ -372,8 +372,8 @@ export const powerGridSkills: PowerGridSkill[] = [
     relatedProjects: ['earth-3d-dashboard', 'plant-haven'],
     description: 'Designing intent-driven interfaces that balance aesthetics, utility, and feedback loops.',
     impact: { scalability: 74, decomposition: 79, architecture: 77, performance: 72 },
-    x: 28,
-    y: 88,
+    x: 24,
+    y: 86,
   },
   {
     id: 'devops',
@@ -385,7 +385,7 @@ export const powerGridSkills: PowerGridSkill[] = [
     description: 'Deployment pipelines, runtime reliability, and operational ownership across environments.',
     impact: { scalability: 81, decomposition: 78, architecture: 80, performance: 79 },
     x: 50,
-    y: 88,
+    y: 86,
   },
   {
     id: 'testing',
@@ -396,8 +396,8 @@ export const powerGridSkills: PowerGridSkill[] = [
     relatedProjects: ['earth-3d-dashboard', 'plant-haven'],
     description: 'Quality discipline through validation strategy, edge-case handling, and regression prevention.',
     impact: { scalability: 78, decomposition: 76, architecture: 79, performance: 74 },
-    x: 80,
-    y: 88,
+    x: 76,
+    y: 86,
   },
 ]
 

@@ -315,8 +315,8 @@ export default function SkillsSection() {
       </motion.div>
 
       <div className="power-grid-shell rounded-[2rem] border border-white/15 bg-black/35 p-3 backdrop-blur-2xl md:p-4">
-        <div className="grid gap-3 xl:grid-cols-[280px_minmax(0,1fr)_300px]">
-          <aside className="rounded-2xl border border-white/10 bg-black/35 p-4">
+        <div className="grid gap-3 xl:grid-cols-[232px_minmax(0,1.8fr)_252px] 2xl:grid-cols-[248px_minmax(0,2fr)_272px]">
+          <aside className="rounded-2xl border border-white/10 bg-black/35 p-3.5 xl:p-4">
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-neon/80">Power Plants</p>
             <p className="mt-2 text-sm text-white/60">Projects generate flow through the skills they depend on.</p>
             <div className="mt-4 space-y-3">
@@ -351,7 +351,7 @@ export default function SkillsSection() {
             </div>
           </aside>
 
-          <div className="rounded-2xl border border-white/10 bg-[#050d1b]/70 p-3 md:p-4">
+          <div className="rounded-2xl border border-white/10 bg-[#050d1b]/70 p-2.5 md:p-3">
             <div className="mb-3 flex items-center justify-between gap-2">
               <div>
                 <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-neon/80">Skill Grid</p>
@@ -362,7 +362,9 @@ export default function SkillsSection() {
               </span>
             </div>
 
-            <div ref={graphRef} className="relative h-[520px] overflow-hidden rounded-2xl border border-white/10 bg-[#030913]">
+            <div ref={graphRef} className="relative h-[560px] overflow-hidden rounded-2xl border border-white/10 bg-[#030913] md:h-[640px] xl:h-[700px]">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(36,210,255,0.08),transparent_60%)]" />
+              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:42px_42px] opacity-20" />
               <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 
               {powerGridSkills.map((skill, index) => {
@@ -376,7 +378,7 @@ export default function SkillsSection() {
                   <motion.button
                     key={skill.id}
                     type="button"
-                    className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full border px-3 py-2 text-center backdrop-blur-md transition ${isSelected ? 'border-white/70 bg-white/18' : 'border-white/25 bg-black/45'} ${dimmed ? 'opacity-35' : 'opacity-100'}`}
+                    className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-2xl border px-2.5 py-1.5 text-center backdrop-blur-md transition md:px-3 md:py-2 ${isSelected ? 'border-white/70 bg-white/18' : 'border-white/25 bg-black/45'} ${dimmed ? 'opacity-35' : 'opacity-100'}`}
                     style={{ left: `${skill.x}%`, top: `${skill.y}%` }}
                     onMouseEnter={() => setHoveredSkillId(skill.id)}
                     onMouseLeave={() => setHoveredSkillId(null)}
@@ -385,6 +387,7 @@ export default function SkillsSection() {
                     onClick={() => setSelectedSkillId(skill.id)}
                     animate={{
                       scale: [baseScale, baseScale + 0.06 + Math.min(0.22, energy * 0.28), baseScale],
+                      y: [0, Math.sin(ambientPhase + index * 0.45) * 3.2, 0],
                       boxShadow: [
                         `0 0 10px rgba(88,246,210,${0.12 + energy * 0.12})`,
                         `0 0 ${18 + energy * 42}px rgba(88,246,210,${0.22 + energy * 0.35})`,
@@ -398,9 +401,9 @@ export default function SkillsSection() {
                     }}
                     whileHover={{ scale: baseScale + 0.16, transition: { duration: 0.18 } }}
                   >
-                    <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-white/55">{skill.category}</p>
-                    <p className="font-display text-base leading-tight text-white">{skill.name}</p>
-                    <p className="font-mono text-[11px] text-neon/90">{skill.strength}%</p>
+                    <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-white/55">{skill.category}</p>
+                    <p className="font-display text-[15px] leading-tight text-white md:text-lg">{skill.name}</p>
+                    <p className="font-mono text-[10px] text-neon/90 md:text-[11px]">{skill.strength}%</p>
                   </motion.button>
                 )
               })}
