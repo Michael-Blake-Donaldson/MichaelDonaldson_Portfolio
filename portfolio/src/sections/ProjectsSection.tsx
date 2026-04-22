@@ -103,6 +103,7 @@ export default function ProjectsSection({
 }: ProjectsSectionProps) {
   const rootRef = useRef<HTMLElement | null>(null)
   const chapterRefs = useRef<Record<string, HTMLElement | null>>({})
+  const progressRailRef = useRef<HTMLDivElement | null>(null)
   const [progressById, setProgressById] = useState<Record<string, number>>({})
   const [activeProjectId, setActiveProjectId] = useState(projects[0]?.id ?? '')
 
@@ -147,6 +148,16 @@ export default function ProjectsSection({
           },
         )
       })
+
+      if (progressRailRef.current) {
+        ScrollTrigger.create({
+          trigger: root,
+          start: 'top top+=96',
+          end: 'bottom bottom-=64',
+          pin: progressRailRef.current,
+          pinSpacing: false,
+        })
+      }
     }, root)
 
     return () => ctx.revert()
@@ -340,8 +351,11 @@ export default function ProjectsSection({
           ))}
         </div>
 
-        <aside className="mt-8 hidden lg:sticky lg:top-24 lg:block lg:self-start">
-          <div className="pointer-events-none w-56 rounded-2xl border border-white/15 bg-black/45 p-4 backdrop-blur-xl">
+        <aside className="mt-8 hidden lg:block lg:self-start">
+          <div
+            ref={progressRailRef}
+            className="pointer-events-none w-56 rounded-2xl border border-white/15 bg-black/45 p-4 backdrop-blur-xl"
+          >
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-neon/75">Scroll Progress</p>
             <div className="mt-3 space-y-3">
               {projects.map((project, index) => {
