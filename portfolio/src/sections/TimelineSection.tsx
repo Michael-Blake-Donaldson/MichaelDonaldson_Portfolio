@@ -20,22 +20,21 @@ export default function TimelineSection() {
         const card = node.querySelector('.planet-card')
 
         if (orb) {
-          gsap.fromTo(
-            orb,
-            { yPercent: -18, scale: 0.9, rotate: -6 },
-            {
-              yPercent: 16,
-              scale: 1.08,
-              rotate: 6,
-              ease: 'none',
-              scrollTrigger: {
-                trigger: node,
-                start: 'top bottom',
-                end: 'bottom top',
-                scrub: true,
-              },
+          gsap.timeline({
+            scrollTrigger: {
+              trigger: node,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: true,
             },
-          )
+          })
+            .fromTo(
+              orb,
+              { scale: 1.34, yPercent: -16, rotate: -8 },
+              { scale: 1.02, yPercent: -2, rotate: 0, ease: 'power2.out', duration: 0.42 },
+            )
+            .to(orb, { scale: 0.8, yPercent: 18, rotate: 8, ease: 'power1.in', duration: 0.33 })
+            .to(orb, { scale: 0.64, yPercent: 28, opacity: 0.84, ease: 'none', duration: 0.25 })
         }
 
         if (ring) {
@@ -58,7 +57,7 @@ export default function TimelineSection() {
         if (card) {
           gsap.fromTo(
             card,
-            { opacity: 0, y: 48 },
+            { opacity: 0, y: 54 },
             {
               opacity: 1,
               y: 0,
@@ -67,7 +66,7 @@ export default function TimelineSection() {
               scrollTrigger: {
                 trigger: node,
                 start: 'top 72%',
-                end: 'top 40%',
+                end: 'top 38%',
                 scrub: 0.4,
               },
             },
@@ -104,6 +103,10 @@ export default function TimelineSection() {
         <h2 className="mt-3 max-w-3xl font-display text-3xl text-white md:text-5xl">
           Descend through the career system: each planet marks a role in my engineering journey.
         </h2>
+        <p className="mt-4 max-w-2xl text-white/70">
+          From production software delivery to large-scale operational leadership, each orbit highlights system thinking,
+          optimization, and ownership under pressure.
+        </p>
       </motion.div>
 
       <div className="space-y-24">
@@ -132,10 +135,22 @@ export default function TimelineSection() {
               <div className={isEven ? 'order-2' : 'order-2 lg:order-1'}>
                 <div className="planet-card rounded-[1.6rem] border border-white/15 bg-black/40 p-6 backdrop-blur-xl md:p-8">
                   <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-neon/80">
-                    Orbital Window {String(index + 1).padStart(2, '0')} • {item.year}
+                    {item.planet} • {item.year}
                   </p>
                   <h3 className="mt-3 font-display text-2xl text-white md:text-3xl">{item.title}</h3>
-                  <p className="mt-4 max-w-xl text-base leading-relaxed text-white/75">{item.detail}</p>
+                  <p className="mt-2 text-sm uppercase tracking-[0.14em] text-white/55">{item.company}</p>
+                  <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.16em] text-white/45">{item.period}</p>
+                  <p className="mt-4 max-w-xl text-base leading-relaxed text-white/75">{item.summary}</p>
+                  <ul className="mt-5 space-y-2">
+                    {item.signals.map((signal) => (
+                      <li
+                        key={`${item.title}-${signal}`}
+                        className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/78"
+                      >
+                        {signal}
+                      </li>
+                    ))}
+                  </ul>
                   <div className="mt-6 h-1.5 overflow-hidden rounded-full border border-white/10 bg-white/10">
                     <div
                       className="h-full bg-gradient-to-r from-neon via-arc to-plasma"

@@ -162,24 +162,62 @@ export const projects: ProjectItem[] = [
 
 export const timelineEvents = [
   {
-    year: '2023',
-    title: 'Started Computer Science Path',
-    detail: 'Committed to software engineering and began structured learning in programming fundamentals.',
-  },
-  {
     year: '2024',
-    title: 'SNHU Coursework and Portfolio Buildout',
-    detail: 'Applied coursework concepts by building practical projects focused on frontend and full-stack foundations.',
+    planet: 'Astra Unscripted',
+    title: 'Full Stack Software Engineer Intern',
+    company: 'Unscripted Inc (Remote)',
+    period: 'May 2024 - September 2024',
+    summary:
+      'Shipped production web features in Agile Scrum workflows while contributing to responsive UI delivery, debugging, performance tuning, and system design discussions across a real engineering team.',
+    signals: [
+      'Worked in Agile sprints, standups, and retrospectives with cross-functional collaboration',
+      'Built and maintained web applications with HTML, CSS, JavaScript, and modern frontend frameworks',
+      'Tested, debugged, and optimized applications for performance and cross-platform behavior',
+      'Participated in architecture discussions and supported teammates with technical troubleshooting',
+    ],
   },
   {
-    year: '2025',
-    title: 'Advanced Project Work and Technical Growth',
-    detail: 'Expanded into API integration, testing, and performance-minded UI engineering patterns.',
+    year: '2022-2024',
+    planet: 'Titan Target',
+    title: 'General Merchandise Manager',
+    company: 'Target',
+    period: 'Leadership and Operations',
+    summary:
+      'Owned high-scale retail operations with data-informed decision loops, translating directly to systems thinking, optimization, and reliability discipline in software engineering.',
+    signals: [
+      'Managed operations producing 8M to 12M annually with ownership over complex workflows',
+      'Led teams of 15 to 30 and managed inventory systems spanning 10,000+ SKUs at 98%+ accuracy',
+      'Reduced shrink by 15% while driving 5 to 10% growth through process and performance tuning',
+      'Applied analytical decision making under pressure in high-variability environments',
+    ],
   },
   {
-    year: '2026',
-    title: 'Targeting Internship and Junior SWE Roles',
-    detail: 'Actively refining this portfolio and pursuing software engineering opportunities with strong mentorship.',
+    year: 'Prior Experience',
+    planet: 'Orion Disney',
+    title: 'Operations Coordinator',
+    company: 'Disney',
+    period: 'Multi-Department Coordination',
+    summary:
+      'Coordinated people, systems, and dependencies across multiple departments, reinforcing distributed-systems style thinking around orchestration, bottlenecks, and throughput.',
+    signals: [
+      'Managed 52+ employees across 6 departments with synchronized execution requirements',
+      'Improved inventory systems by 18% through process redesign and workflow refinement',
+      'Built training systems to improve consistency, speed to competency, and execution quality',
+    ],
+  },
+  {
+    year: 'Prior Experience',
+    planet: 'Nova Arbys',
+    title: 'General Manager',
+    company: "Arby's",
+    period: 'Performance and Team Leadership',
+    summary:
+      'Led under pressure with a strong optimization mindset, improving retention and business outcomes through operational experimentation and continuous improvement.',
+    signals: [
+      'Increased retention from 67% to 92% through structured coaching and process accountability',
+      'Increased revenue by 34% using targeted operational improvements and execution discipline',
+      'Built leadership habits that transfer to engineering ownership and delivery reliability',
+    ],
   },
 ]
 
