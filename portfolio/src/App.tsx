@@ -28,6 +28,7 @@ const sectionOrder: SectionId[] = [
 const INTRO_NARRATION_SRC = '/audio/LoadInSpeech.mp3'
 const PROJECT_VAULT_SPEECH_SRC = '/audio/ProjectVaultSpeech.mp3'
 const FLUX_TIMELINE_SPEECH_SRC = '/audio/FluxTimelineSpeech.mp3'
+const SKILL_GRAPH_SPEECH_SRC = '/audio/SkillGraphSpeech.mp3'
 
 function App() {
   const [activeSection, setActiveSection] = useState<SectionId>('hero')
@@ -48,6 +49,7 @@ function App() {
   const introNarrationAttemptedRef = useRef(false)
   const projectVaultSpeechRef = useRef<HTMLAudioElement | null>(null)
   const fluxTimelineSpeechRef = useRef<HTMLAudioElement | null>(null)
+  const skillGraphSpeechRef = useRef<HTMLAudioElement | null>(null)
 
   const playProjectVaultSpeech = useCallback(() => {
     const audio = projectVaultSpeechRef.current ?? new Audio(PROJECT_VAULT_SPEECH_SRC)
@@ -61,6 +63,15 @@ function App() {
   const playFluxTimelineSpeech = useCallback(() => {
     const audio = fluxTimelineSpeechRef.current ?? new Audio(FLUX_TIMELINE_SPEECH_SRC)
     fluxTimelineSpeechRef.current = audio
+    audio.currentTime = 0
+    void audio.play().catch(() => {
+      // Ignore autoplay restrictions; this should normally be user-gesture initiated.
+    })
+  }, [])
+
+  const playSkillGraphSpeech = useCallback(() => {
+    const audio = skillGraphSpeechRef.current ?? new Audio(SKILL_GRAPH_SPEECH_SRC)
+    skillGraphSpeechRef.current = audio
     audio.currentTime = 0
     void audio.play().catch(() => {
       // Ignore autoplay restrictions; this should normally be user-gesture initiated.
@@ -134,6 +145,7 @@ function App() {
       '3': () => setActiveSection('timeline'),
       '4': () => {
         soundFx.playClick()
+        playSkillGraphSpeech()
         if (activeSection !== 'skills' && !isBreachTransitioning) {
           setIsBreachTransitioning(true)
           return
@@ -156,7 +168,7 @@ function App() {
         })
       },
     }),
-    [activeSection, isBreachTransitioning, soundFx],
+    [activeSection, isBreachTransitioning, playSkillGraphSpeech, soundFx],
   )
 
   useEffect(() => {
@@ -177,13 +189,16 @@ function App() {
       if (id === 'timeline') {
         playFluxTimelineSpeech()
       }
+      if (id === 'skills') {
+        playSkillGraphSpeech()
+      }
       if (id === 'skills' && activeSection !== 'skills' && !isBreachTransitioning) {
         setIsBreachTransitioning(true)
         return
       }
       setActiveSection(id)
     },
-    [activeSection, isBreachTransitioning, playFluxTimelineSpeech, playProjectVaultSpeech, soundFx],
+    [activeSection, isBreachTransitioning, playFluxTimelineSpeech, playProjectVaultSpeech, playSkillGraphSpeech, soundFx],
   )
 
   useKeyboardShortcuts(shortcuts)
