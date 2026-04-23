@@ -151,9 +151,18 @@ const sessionCache: SessionCache = {
 // MAIN COMPONENT
 // ---------------------------------------------------------------------------
 
-interface Props { reducedMotion?: boolean }
+function stopAudio(audio: HTMLAudioElement | undefined) {
+  if (!audio) return
+  audio.pause()
+  audio.currentTime = 0
+}
 
-export default function SkillsSection({ reducedMotion = false }: Props) {
+interface Props {
+  reducedMotion?: boolean
+  soundEnabled?: boolean
+}
+
+export default function SkillsSection({ reducedMotion = false, soundEnabled = false }: Props) {
   // Initialise from session cache so remounts restore the last state
   const [scene, setScene]                       = useState<Scene>(sessionCache.scene)
   const [activatedSkills, setActivatedSkills]   = useState<Set<string>>(new Set(sessionCache.activatedSkills))
@@ -172,8 +181,15 @@ export default function SkillsSection({ reducedMotion = false }: Props) {
   useEffect(() => { sceneRef.current = scene }, [scene])
 
   useEffect(() => {
+    if (soundEnabled) return
+
+    Object.values(sceneSpeechRef.current).forEach((audio) => stopAudio(audio))
+  }, [soundEnabled])
+
+  useEffect(() => {
     const src = SCENE_SPEECH[scene]
     if (!src || lastNarratedSceneRef.current === scene) return
+    if (!soundEnabled) return
 
     lastNarratedSceneRef.current = scene
 
@@ -184,7 +200,7 @@ export default function SkillsSection({ reducedMotion = false }: Props) {
     void audio.play().catch(() => {
       // Ignore autoplay restrictions; later scene changes are typically gesture-initiated by entering the tab.
     })
-  }, [scene])
+  }, [scene, soundEnabled])
 
   // entrance fade-in
   useEffect(() => {

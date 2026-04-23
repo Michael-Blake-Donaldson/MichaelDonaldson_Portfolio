@@ -30,6 +30,12 @@ const PROJECT_VAULT_SPEECH_SRC = '/audio/ProjectVaultSpeech.mp3'
 const FLUX_TIMELINE_SPEECH_SRC = '/audio/FluxTimelineSpeech.mp3'
 const SKILL_GRAPH_SPEECH_SRC = '/audio/SkillGraphSpeech.mp3'
 
+function stopAudio(audio: HTMLAudioElement | null) {
+  if (!audio) return
+  audio.pause()
+  audio.currentTime = 0
+}
+
 function App() {
   const [activeSection, setActiveSection] = useState<SectionId>('hero')
   const [isBreachTransitioning, setIsBreachTransitioning] = useState(false)
@@ -47,36 +53,40 @@ function App() {
   const soundFx = useSoundFx(false)
   const transitionPolicy = getTransitionPolicy(reducedMotionEnabled)
   const introNarrationAttemptedRef = useRef(false)
+  const introNarrationRef = useRef<HTMLAudioElement | null>(null)
   const projectVaultSpeechRef = useRef<HTMLAudioElement | null>(null)
   const fluxTimelineSpeechRef = useRef<HTMLAudioElement | null>(null)
   const skillGraphSpeechRef = useRef<HTMLAudioElement | null>(null)
 
   const playProjectVaultSpeech = useCallback(() => {
+    if (!soundFx.enabled) return
     const audio = projectVaultSpeechRef.current ?? new Audio(PROJECT_VAULT_SPEECH_SRC)
     projectVaultSpeechRef.current = audio
     audio.currentTime = 0
     void audio.play().catch(() => {
       // Ignore autoplay restrictions; this should normally be user-gesture initiated.
     })
-  }, [])
+  }, [soundFx.enabled])
 
   const playFluxTimelineSpeech = useCallback(() => {
+    if (!soundFx.enabled) return
     const audio = fluxTimelineSpeechRef.current ?? new Audio(FLUX_TIMELINE_SPEECH_SRC)
     fluxTimelineSpeechRef.current = audio
     audio.currentTime = 0
     void audio.play().catch(() => {
       // Ignore autoplay restrictions; this should normally be user-gesture initiated.
     })
-  }, [])
+  }, [soundFx.enabled])
 
   const playSkillGraphSpeech = useCallback(() => {
+    if (!soundFx.enabled) return
     const audio = skillGraphSpeechRef.current ?? new Audio(SKILL_GRAPH_SPEECH_SRC)
     skillGraphSpeechRef.current = audio
     audio.currentTime = 0
     void audio.play().catch(() => {
       // Ignore autoplay restrictions; this should normally be user-gesture initiated.
     })
-  }, [])
+  }, [soundFx.enabled])
 
   useEffect(() => {
     const bootTimer = window.setTimeout(() => setBootDone(true), 2800)
@@ -85,10 +95,12 @@ function App() {
 
   useEffect(() => {
     if (!bootDone || activeSection !== 'hero' || introNarrationAttemptedRef.current) return
+    if (!soundFx.enabled) return
 
     introNarrationAttemptedRef.current = true
 
-    const audio = new Audio(INTRO_NARRATION_SRC)
+    const audio = introNarrationRef.current ?? new Audio(INTRO_NARRATION_SRC)
+    introNarrationRef.current = audio
     audio.preload = 'auto'
     audio.volume = 0.9
 
@@ -115,9 +127,18 @@ function App() {
       window.removeEventListener('pointerdown', onUnlockInteraction)
       window.removeEventListener('keydown', onUnlockInteraction)
       window.removeEventListener('touchstart', onUnlockInteraction)
-      audio.pause()
+      stopAudio(audio)
     }
-  }, [bootDone, activeSection])
+  }, [bootDone, activeSection, soundFx.enabled])
+
+  useEffect(() => {
+    if (soundFx.enabled) return
+
+    stopAudio(introNarrationRef.current)
+    stopAudio(projectVaultSpeechRef.current)
+    stopAudio(fluxTimelineSpeechRef.current)
+    stopAudio(skillGraphSpeechRef.current)
+  }, [soundFx.enabled])
 
   useEffect(() => {
     let rafId = 0
@@ -214,7 +235,7 @@ function App() {
       <AnimatePresence>
         {activeSection === 'skills' ? (
           <Suspense fallback={null}>
-            <SkillsSection reducedMotion={reducedMotionEnabled} />
+            <SkillsSection reducedMotion={reducedMotionEnabled} soundEnabled={soundFx.enabled} />
           </Suspense>
         ) : null}
       </AnimatePresence>
