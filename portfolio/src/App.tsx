@@ -15,14 +15,12 @@ import type { SectionId } from './types'
 
 const HeroSection = lazy(() => import('./sections/HeroSection'))
 const ProjectsSection = lazy(() => import('./sections/ProjectsSection'))
-const CommandCenterSection = lazy(() => import('./sections/CommandCenterSection'))
 const TimelineSection = lazy(() => import('./sections/TimelineSection'))
 const SkillsSection = lazy(() => import('./sections/SkillsSection'))
 
 const sectionOrder: SectionId[] = [
   'hero',
   'projects',
-  'command-center',
   'timeline',
   'skills',
 ]
@@ -72,9 +70,8 @@ function App() {
       'escape': () => setPaletteOpen(false),
       '1': () => setActiveSection('hero'),
       '2': () => setActiveSection('projects'),
-      '3': () => setActiveSection('command-center'),
-      '4': () => setActiveSection('timeline'),
-      '5': () => {
+      '3': () => setActiveSection('timeline'),
+      '4': () => {
         soundFx.playClick()
         if (activeSection !== 'skills' && !isBreachTransitioning) {
           setIsBreachTransitioning(true)
@@ -106,7 +103,6 @@ function App() {
       void import('./sections/ProjectsSection')
     }
     if (activeSection === 'projects') {
-      void import('./sections/CommandCenterSection')
       void import('./sections/TimelineSection')
     }
   }, [activeSection])
@@ -182,7 +178,6 @@ function App() {
                     soundFx={soundFx}
                   />
                 ) : null}
-                {activeSection === 'command-center' ? <CommandCenterSection /> : null}
                 {activeSection === 'timeline' ? <TimelineSection /> : null}
               </Suspense>
             </motion.div>
