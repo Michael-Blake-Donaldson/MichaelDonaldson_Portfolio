@@ -120,19 +120,42 @@ const ACTIVATION_MESSAGES: Record<string, string> = {
 }
 
 // ---------------------------------------------------------------------------
+// SESSION CACHE — persists across component remounts within the same page load
+// ---------------------------------------------------------------------------
+
+interface SessionCache {
+  scene: Scene
+  activatedSkills: Set<string>
+  revealedSkills: Set<string>
+  sequenceIndex: number
+  selectedSkillId: string | null
+  cinematicDone: boolean
+}
+
+const sessionCache: SessionCache = {
+  scene: 'breach',
+  activatedSkills: new Set(),
+  revealedSkills: new Set(),
+  sequenceIndex: 0,
+  selectedSkillId: null,
+  cinematicDone: false,
+}
+
+// ---------------------------------------------------------------------------
 // MAIN COMPONENT
 // ---------------------------------------------------------------------------
 
 interface Props { reducedMotion?: boolean }
 
 export default function SkillsSection({ reducedMotion = false }: Props) {
-  const [scene, setScene]                     = useState<Scene>('breach')
-  const [activatedSkills, setActivatedSkills] = useState<Set<string>>(new Set())
-  const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null)
-  const [lastActivated, setLastActivated]     = useState<string | null>(null)
-  const [isVisible, setIsVisible]             = useState(false)
-  const [sequenceIndex, setSequenceIndex]     = useState(0)
-  const [revealedSkills, setRevealedSkills]     = useState<Set<string>>(new Set())
+  // Initialise from session cache so remounts restore the last state
+  const [scene, setScene]                       = useState<Scene>(sessionCache.scene)
+  const [activatedSkills, setActivatedSkills]   = useState<Set<string>>(new Set(sessionCache.activatedSkills))
+  const [selectedSkillId, setSelectedSkillId]   = useState<string | null>(sessionCache.selectedSkillId)
+  const [lastActivated, setLastActivated]       = useState<string | null>(null)
+  const [isVisible, setIsVisible]               = useState(false)
+  const [sequenceIndex, setSequenceIndex]       = useState(sessionCache.sequenceIndex)
+  const [revealedSkills, setRevealedSkills]     = useState<Set<string>>(new Set(sessionCache.revealedSkills))
 
   const canvasRef  = useRef<HTMLCanvasElement>(null)
   const rafRef     = useRef<number>(0)
@@ -146,11 +169,16 @@ export default function SkillsSection({ reducedMotion = false }: Props) {
     return () => clearTimeout(t)
   }, [])
 
-  // scene auto-advance
+  // scene auto-advance (skipped if cinematic already completed this session)
   useEffect(() => {
+    if (sessionCache.cinematicDone) return  // already watched — restore directly
+
     if (reducedMotion) {
       setScene('online')
       setActivatedSkills(new Set(powerGridSkills.map(s => s.id)))
+      sessionCache.cinematicDone = true
+      sessionCache.scene = 'online'
+      sessionCache.activatedSkills = new Set(powerGridSkills.map(s => s.id))
       return
     }
     const timers: number[] = []
@@ -159,7 +187,13 @@ export default function SkillsSection({ reducedMotion = false }: Props) {
       if (SCENE_DURATIONS[s] === Infinity) break
       elapsed += SCENE_DURATIONS[s]
       const next = SCENE_SEQUENCE[SCENE_SEQUENCE.indexOf(s) + 1]
-      if (next) timers.push(window.setTimeout(() => setScene(next), elapsed))
+      if (next) {
+        timers.push(window.setTimeout(() => {
+          setScene(next)
+          sessionCache.scene = next
+          if (next === 'online') sessionCache.cinematicDone = true
+        }, elapsed))
+      }
     }
     return () => timers.forEach(clearTimeout)
   }, [reducedMotion])
@@ -170,7 +204,11 @@ export default function SkillsSection({ reducedMotion = false }: Props) {
     const timers: number[] = []
     ACTIVATION_ORDER.forEach((id, i) => {
       timers.push(window.setTimeout(() => {
-        setActivatedSkills(prev => new Set([...prev, id]))
+        setActivatedSkills(prev => {
+          const next = new Set([...prev, id])
+          sessionCache.activatedSkills = next
+          return next
+        })
         setLastActivated(id)
       }, i * 480))
     })
@@ -180,7 +218,9 @@ export default function SkillsSection({ reducedMotion = false }: Props) {
   // all online in recovery / online
   useEffect(() => {
     if (scene === 'recovery' || scene === 'online') {
-      setActivatedSkills(new Set(powerGridSkills.map(s => s.id)))
+      const all = new Set(powerGridSkills.map(s => s.id))
+      setActivatedSkills(all)
+      sessionCache.activatedSkills = all
     }
   }, [scene])
 
@@ -282,9 +322,13 @@ export default function SkillsSection({ reducedMotion = false }: Props) {
 
   useEffect(() => {
     if (scene !== 'online') return
-    setSequenceIndex(0)
-    setRevealedSkills(new Set())
-    setSelectedSkillId(null)
+    // Only reset to fresh sequence if this is the first time we've hit online
+    // (cache.revealedSkills will already be populated on a remount)
+    if (sessionCache.revealedSkills.size === 0 && sessionCache.sequenceIndex === 0) {
+      setSequenceIndex(0)
+      setRevealedSkills(new Set())
+      setSelectedSkillId(null)
+    }
   }, [scene])
 
   const getNodeState = useCallback((id: string): NodeState => {
@@ -319,16 +363,29 @@ export default function SkillsSection({ reducedMotion = false }: Props) {
 
     // Sequential reveal mode: only the pulsing target is clickable
     if (scene === 'online' && !isSequenceComplete && sequenceTargetId) {
-      if (id !== sequenceTargetId) return  // ignore wrong node clicks
-      setRevealedSkills(prev => new Set([...prev, id]))
+      if (id !== sequenceTargetId) return
+      setRevealedSkills(prev => {
+        const next = new Set([...prev, id])
+        sessionCache.revealedSkills = next
+        return next
+      })
       setSelectedSkillId(id)
+      sessionCache.selectedSkillId = id
       setLastActivated(id)
-      setSequenceIndex(prev => prev + 1)
+      setSequenceIndex(prev => {
+        const next = prev + 1
+        sessionCache.sequenceIndex = next
+        return next
+      })
       return
     }
 
     // Free-inspect mode after sequence is done
-    setSelectedSkillId(prev => prev === id ? null : id)
+    setSelectedSkillId(prev => {
+      const next = prev === id ? null : id
+      sessionCache.selectedSkillId = next
+      return next
+    })
   }, [scene, isSequenceComplete, sequenceTargetId])
 
   const canInteract = scene !== 'breach' && scene !== 'diagnosis'
