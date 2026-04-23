@@ -41,13 +41,9 @@ function App() {
   })
   const { unlocked, reset } = useEasterEgg()
   const prefersReducedMotion = usePrefersReducedMotion()
-  const [reducedMotionEnabled, setReducedMotionEnabled] = useState(false)
+  const [reducedMotionEnabled, setReducedMotionEnabled] = useState(prefersReducedMotion)
   const soundFx = useSoundFx(false)
   const transitionPolicy = getTransitionPolicy(reducedMotionEnabled)
-
-  useEffect(() => {
-    setReducedMotionEnabled(prefersReducedMotion)
-  }, [prefersReducedMotion])
 
   useEffect(() => {
     const bootTimer = window.setTimeout(() => setBootDone(true), 2800)
