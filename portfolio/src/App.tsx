@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { BootSequence } from './components/effects/BootSequence'
 import { SystemBreachTransition } from './components/effects/SystemBreachTransition'
 import { ParticleField } from './components/effects/ParticleField'
@@ -25,6 +25,9 @@ const sectionOrder: SectionId[] = [
   'skills',
 ]
 
+const INTRO_NARRATION_KEY = 'mdp:introNarrationPlayed:v1'
+const INTRO_NARRATION_SRC = '/audio/LoadInSpeech.mp3'
+
 function App() {
   const [activeSection, setActiveSection] = useState<SectionId>('hero')
   const [isBreachTransitioning, setIsBreachTransitioning] = useState(false)
@@ -41,11 +44,58 @@ function App() {
   const [reducedMotionEnabled, setReducedMotionEnabled] = useState(prefersReducedMotion)
   const soundFx = useSoundFx(false)
   const transitionPolicy = getTransitionPolicy(reducedMotionEnabled)
+  const introNarrationAttemptedRef = useRef(false)
 
   useEffect(() => {
     const bootTimer = window.setTimeout(() => setBootDone(true), 2800)
     return () => window.clearTimeout(bootTimer)
   }, [])
+
+  useEffect(() => {
+    if (!bootDone || activeSection !== 'hero' || introNarrationAttemptedRef.current) return
+
+    const alreadyPlayed = window.localStorage.getItem(INTRO_NARRATION_KEY) === '1'
+    if (alreadyPlayed) {
+      introNarrationAttemptedRef.current = true
+      return
+    }
+
+    introNarrationAttemptedRef.current = true
+
+    const audio = new Audio(INTRO_NARRATION_SRC)
+    audio.preload = 'auto'
+    audio.volume = 0.9
+
+    let unlockedByInteraction = false
+
+    const onUnlockInteraction = () => {
+      if (unlockedByInteraction) return
+      unlockedByInteraction = true
+      void audio.play().then(() => {
+        window.localStorage.setItem(INTRO_NARRATION_KEY, '1')
+      }).catch(() => {
+        // Keep first-visit state unchanged if playback still fails.
+      })
+      window.removeEventListener('pointerdown', onUnlockInteraction)
+      window.removeEventListener('keydown', onUnlockInteraction)
+      window.removeEventListener('touchstart', onUnlockInteraction)
+    }
+
+    void audio.play().then(() => {
+      window.localStorage.setItem(INTRO_NARRATION_KEY, '1')
+    }).catch(() => {
+      window.addEventListener('pointerdown', onUnlockInteraction, { once: true })
+      window.addEventListener('keydown', onUnlockInteraction, { once: true })
+      window.addEventListener('touchstart', onUnlockInteraction, { once: true })
+    })
+
+    return () => {
+      window.removeEventListener('pointerdown', onUnlockInteraction)
+      window.removeEventListener('keydown', onUnlockInteraction)
+      window.removeEventListener('touchstart', onUnlockInteraction)
+      audio.pause()
+    }
+  }, [bootDone, activeSection])
 
   useEffect(() => {
     let rafId = 0
