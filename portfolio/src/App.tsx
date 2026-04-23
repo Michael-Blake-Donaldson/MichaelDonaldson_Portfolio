@@ -26,6 +26,7 @@ const sectionOrder: SectionId[] = [
 ]
 
 const INTRO_NARRATION_SRC = '/audio/LoadInSpeech.mp3'
+const PROJECT_VAULT_SPEECH_SRC = '/audio/ProjectVaultSpeech.mp3'
 
 function App() {
   const [activeSection, setActiveSection] = useState<SectionId>('hero')
@@ -44,6 +45,16 @@ function App() {
   const soundFx = useSoundFx(false)
   const transitionPolicy = getTransitionPolicy(reducedMotionEnabled)
   const introNarrationAttemptedRef = useRef(false)
+  const projectVaultSpeechRef = useRef<HTMLAudioElement | null>(null)
+
+  const playProjectVaultSpeech = useCallback(() => {
+    const audio = projectVaultSpeechRef.current ?? new Audio(PROJECT_VAULT_SPEECH_SRC)
+    projectVaultSpeechRef.current = audio
+    audio.currentTime = 0
+    void audio.play().catch(() => {
+      // Ignore autoplay restrictions; this should normally be user-gesture initiated.
+    })
+  }, [])
 
   useEffect(() => {
     const bootTimer = window.setTimeout(() => setBootDone(true), 2800)
@@ -149,13 +160,16 @@ function App() {
   const handleSectionSelect = useCallback(
     (id: SectionId) => {
       soundFx.playClick()
+      if (id === 'projects') {
+        playProjectVaultSpeech()
+      }
       if (id === 'skills' && activeSection !== 'skills' && !isBreachTransitioning) {
         setIsBreachTransitioning(true)
         return
       }
       setActiveSection(id)
     },
-    [activeSection, isBreachTransitioning, soundFx],
+    [activeSection, isBreachTransitioning, playProjectVaultSpeech, soundFx],
   )
 
   useKeyboardShortcuts(shortcuts)
