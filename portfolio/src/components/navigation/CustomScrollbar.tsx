@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import type { SectionId } from '../../types'
 
 const MIN_THUMB = 56
 
@@ -6,10 +7,15 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value))
 }
 
-export function CustomScrollbar() {
+interface CustomScrollbarProps {
+  activeSection: SectionId
+}
+
+export function CustomScrollbar({ activeSection }: CustomScrollbarProps) {
   const trackRef = useRef<HTMLDivElement | null>(null)
   const dragRef = useRef({ active: false, pointerOffset: 0 })
   const [enabled, setEnabled] = useState(false)
+  const [scrollable, setScrollable] = useState(false)
   const [progress, setProgress] = useState(0)
   const [thumbHeight, setThumbHeight] = useState(0)
 
@@ -35,6 +41,7 @@ export function CustomScrollbar() {
       const maxScroll = Math.max(doc.scrollHeight - window.innerHeight, 0)
       const current = maxScroll > 0 ? window.scrollY / maxScroll : 0
       setProgress(current)
+      setScrollable(maxScroll > 2)
 
       const track = trackRef.current
       if (!track) return
@@ -50,7 +57,7 @@ export function CustomScrollbar() {
       window.removeEventListener('scroll', sync)
       window.removeEventListener('resize', sync)
     }
-  }, [enabled])
+  }, [enabled, activeSection])
 
   useEffect(() => {
     if (!enabled) return
@@ -82,7 +89,8 @@ export function CustomScrollbar() {
     }
   }, [enabled, thumbHeight])
 
-  if (!enabled) return null
+  const hideForSection = activeSection === 'skills'
+  if (!enabled || hideForSection || !scrollable) return null
 
   const handleTrackPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     const track = trackRef.current
@@ -116,15 +124,18 @@ export function CustomScrollbar() {
   const thumbTop = hide ? 0 : progress * maxThumbTop
 
   return (
-    <div className="pointer-events-none fixed inset-y-0 right-0 z-[82] hidden w-6 md:block">
+    <div
+      className="pointer-events-none fixed inset-y-0 z-[82] hidden w-12 md:block"
+      style={{ right: 'clamp(0.75rem, 2.2vw, 2rem)' }}
+    >
       <div
         ref={trackRef}
-        className="pointer-events-auto absolute bottom-6 right-2 top-6 w-2 rounded-full border border-white/10 bg-black/35 backdrop-blur-sm"
+        className="pointer-events-auto absolute bottom-6 right-3 top-6 w-3 rounded-full border border-neon/20 bg-black/50 shadow-[0_0_24px_rgba(0,0,0,0.35)] backdrop-blur-sm"
         onPointerDown={handleTrackPointerDown}
         aria-hidden
       >
         <div
-          className="absolute left-0.5 right-0.5 rounded-full border border-neon/35 bg-gradient-to-b from-neon/80 to-arc/70 shadow-[0_0_14px_rgba(88,246,210,0.35)]"
+          className="absolute left-[2px] right-[2px] rounded-full border border-neon/40 bg-gradient-to-b from-neon/95 to-arc/85 shadow-[0_0_18px_rgba(88,246,210,0.45)]"
           style={{
             height: `${Math.max(thumbHeight, MIN_THUMB)}px`,
             transform: `translateY(${thumbTop}px)`,

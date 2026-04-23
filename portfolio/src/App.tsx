@@ -131,7 +131,7 @@ function App() {
     <div className="relative min-h-screen overflow-x-hidden bg-abyss text-white">
       {showParticles && !reducedMotionEnabled ? <ParticleField /> : null}
       {!reducedMotionEnabled ? <CustomCursor /> : null}
-      <CustomScrollbar />
+      <CustomScrollbar activeSection={activeSection} />
 
       <div className="pointer-events-none fixed inset-0 z-0 bg-noise opacity-90" />
       <div className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(circle_at_50%_120%,rgba(255,90,191,0.15),transparent_60%)]" />
