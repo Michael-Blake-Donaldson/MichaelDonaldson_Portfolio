@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import { BootSequence } from './components/effects/BootSequence'
+import { SystemBreachTransition } from './components/effects/SystemBreachTransition'
 import { CustomCursor } from './components/effects/CustomCursor'
 import { ParticleField } from './components/effects/ParticleField'
 import { CommandPalette } from './components/navigation/CommandPalette'
@@ -29,6 +30,7 @@ const sectionOrder: SectionId[] = [
 
 function App() {
   const [activeSection, setActiveSection] = useState<SectionId>('hero')
+  const [isBreachTransitioning, setIsBreachTransitioning] = useState(false)
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [bootDone, setBootDone] = useState(false)
   const [showParticles, setShowParticles] = useState(true)
@@ -107,6 +109,18 @@ function App() {
     }
   }, [activeSection])
 
+  const handleSectionSelect = useCallback(
+    (id: SectionId) => {
+      soundFx.playClick()
+      if (id === 'skills' && activeSection !== 'skills' && !isBreachTransitioning) {
+        setIsBreachTransitioning(true)
+        return
+      }
+      setActiveSection(id)
+    },
+    [activeSection, isBreachTransitioning, soundFx],
+  )
+
   useKeyboardShortcuts(shortcuts)
 
   return (
@@ -117,48 +131,67 @@ function App() {
       <div className="pointer-events-none fixed inset-0 z-0 bg-noise opacity-90" />
       <div className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(circle_at_50%_120%,rgba(255,90,191,0.15),transparent_60%)]" />
 
-      <main className="relative z-10 mx-auto w-full max-w-[1280px] px-2 pb-44 sm:pb-40 md:px-6 md:pb-36">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeSection}
-            initial={{ opacity: 0, y: transitionPolicy.yOffset, filter: transitionPolicy.blur }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -transitionPolicy.yOffset, filter: transitionPolicy.blur }}
-            transition={{ duration: transitionPolicy.duration, ease: transitionPolicy.ease }}
-          >
-            <Suspense
-              fallback={
-                <div className="flex min-h-[70vh] items-center justify-center font-mono text-xs uppercase tracking-[0.22em] text-white/50">
-                  loading viewport...
-                </div>
-              }
+      {/* Skills cinematic — full-screen, outside the constrained main */}
+      <AnimatePresence>
+        {activeSection === 'skills' ? (
+          <Suspense fallback={null}>
+            <SkillsSection reducedMotion={reducedMotionEnabled} />
+          </Suspense>
+        ) : null}
+      </AnimatePresence>
+
+      {/* Breach transition overlay */}
+      {isBreachTransitioning ? (
+        <SystemBreachTransition
+          onMountSkills={() => setActiveSection('skills')}
+          onComplete={() => setIsBreachTransitioning(false)}
+        />
+      ) : null}
+
+      {/* Normal constrained sections */}
+      {activeSection !== 'skills' ? (
+        <main className="relative z-10 mx-auto w-full max-w-[1280px] px-2 pb-44 sm:pb-40 md:px-6 md:pb-36">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeSection}
+              initial={{ opacity: 0, y: transitionPolicy.yOffset, filter: transitionPolicy.blur }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: -transitionPolicy.yOffset, filter: transitionPolicy.blur }}
+              transition={{ duration: transitionPolicy.duration, ease: transitionPolicy.ease }}
             >
-              {activeSection === 'hero' ? (
-                <HeroSection
-                  onNavigateProjects={() => setActiveSection('projects')}
-                  pointer={pointer}
-                  soundFx={soundFx}
-                />
-              ) : null}
-              {activeSection === 'projects' ? (
-                <ProjectsSection
-                  initialProjectId={pendingProjectId}
-                  clearInitialProject={() => setPendingProjectId(undefined)}
-                  soundFx={soundFx}
-                />
-              ) : null}
-              {activeSection === 'command-center' ? <CommandCenterSection /> : null}
-              {activeSection === 'timeline' ? <TimelineSection /> : null}
-              {activeSection === 'skills' ? <SkillsSection /> : null}
-            </Suspense>
-          </motion.div>
-        </AnimatePresence>
-      </main>
+              <Suspense
+                fallback={
+                  <div className="flex min-h-[70vh] items-center justify-center font-mono text-xs uppercase tracking-[0.22em] text-white/50">
+                    loading viewport...
+                  </div>
+                }
+              >
+                {activeSection === 'hero' ? (
+                  <HeroSection
+                    onNavigateProjects={() => setActiveSection('projects')}
+                    pointer={pointer}
+                    soundFx={soundFx}
+                  />
+                ) : null}
+                {activeSection === 'projects' ? (
+                  <ProjectsSection
+                    initialProjectId={pendingProjectId}
+                    clearInitialProject={() => setPendingProjectId(undefined)}
+                    soundFx={soundFx}
+                  />
+                ) : null}
+                {activeSection === 'command-center' ? <CommandCenterSection /> : null}
+                {activeSection === 'timeline' ? <TimelineSection /> : null}
+              </Suspense>
+            </motion.div>
+          </AnimatePresence>
+        </main>
+      ) : null}
 
       <FloatingDock
         items={navItems}
         active={activeSection}
-        onSelect={setActiveSection}
+        onSelect={handleSectionSelect}
         onPalette={() => setPaletteOpen(true)}
         soundEnabled={soundFx.enabled}
         particlesEnabled={showParticles}
