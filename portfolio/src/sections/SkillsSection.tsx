@@ -43,7 +43,7 @@ const NODE_POSITIONS: Record<string, { x: number; y: number }> = {
   'websockets':    { x: 12,  y: 68 },
   'apis':          { x: 37,  y: 64 },
   'databases':     { x: 63,  y: 64 },
-  'ux-design':     { x: 87,  y: 68 },
+  'ux-design':     { x: 74,  y: 58 },
   'devops':        { x: 28,  y: 74 },
   'testing':       { x: 72,  y: 74 },
 }
