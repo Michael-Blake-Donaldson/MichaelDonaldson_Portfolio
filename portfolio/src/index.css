@@ -84,12 +84,28 @@ body {
     cursor: none !important;
   }
 
+  html,
+  body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
   ::-webkit-scrollbar,
   ::-webkit-scrollbar-thumb,
   ::-webkit-scrollbar-track,
   ::-webkit-scrollbar-corner {
     cursor: none !important;
   }
+}
+
+.custom-scroll-dragging {
+  user-select: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
