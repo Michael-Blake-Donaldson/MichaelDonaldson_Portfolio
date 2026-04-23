@@ -34,18 +34,18 @@ const SCENE_DURATIONS: Record<Scene, number> = {
 }
 
 const NODE_POSITIONS: Record<string, { x: number; y: number }> = {
-  'javascript':    { x: 10,  y: 26 },
+  'javascript':    { x: 12,  y: 30 },
   'typescript':    { x: 48,  y: 17 },
   'python':        { x: 86,  y: 26 },
   'react':         { x: 20,  y: 44 },
   'system-design': { x: 50,  y: 46 },
   'data-modeling': { x: 80,  y: 44 },
-  'websockets':    { x: 10,  y: 64 },
-  'apis':          { x: 37,  y: 68 },
-  'databases':     { x: 63,  y: 68 },
-  'ux-design':     { x: 87,  y: 64 },
-  'devops':        { x: 28,  y: 82 },
-  'testing':       { x: 72,  y: 82 },
+  'websockets':    { x: 12,  y: 68 },
+  'apis':          { x: 37,  y: 64 },
+  'databases':     { x: 63,  y: 64 },
+  'ux-design':     { x: 87,  y: 68 },
+  'devops':        { x: 28,  y: 74 },
+  'testing':       { x: 72,  y: 74 },
 }
 
 const CATEGORY_COLORS: Record<string, { hex: string; rgb: string; dim: string }> = {
@@ -131,6 +131,8 @@ export default function SkillsSection({ reducedMotion = false }: Props) {
   const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null)
   const [lastActivated, setLastActivated]     = useState<string | null>(null)
   const [isVisible, setIsVisible]             = useState(false)
+  const [sequenceIndex, setSequenceIndex]     = useState(0)
+  const [revealedSkills, setRevealedSkills]     = useState<Set<string>>(new Set())
 
   const canvasRef  = useRef<HTMLCanvasElement>(null)
   const rafRef     = useRef<number>(0)
@@ -273,9 +275,33 @@ export default function SkillsSection({ reducedMotion = false }: Props) {
   const skillMap = useMemo(
     () => Object.fromEntries(powerGridSkills.map(s => [s.id,s])) as Record<string,PowerGridSkill>, []
   )
+  const sequenceTargetId = sequenceIndex < ACTIVATION_ORDER.length ? ACTIVATION_ORDER[sequenceIndex] : null
+  const isSequenceComplete = sequenceIndex >= ACTIVATION_ORDER.length
+  const sequenceTargetSkill = sequenceTargetId ? skillMap[sequenceTargetId] : null
   const selectedSkill = selectedSkillId ? skillMap[selectedSkillId] : null
 
+  useEffect(() => {
+    if (scene !== 'online') return
+    setSequenceIndex(0)
+    setRevealedSkills(new Set())
+    setSelectedSkillId(null)
+  }, [scene])
+
   const getNodeState = useCallback((id: string): NodeState => {
+    // Sequential reveal mode: only revealed nodes + current target are meaningful
+    if (scene === 'online' && !isSequenceComplete) {
+      if (id === sequenceTargetId) return 'activating'
+      if (revealedSkills.has(id)) {
+        if (selectedSkillId === id) return 'selected'
+        if (selectedSkillId) {
+          const sel = skillMap[selectedSkillId]
+          if (sel && (sel.connections.includes(id) || skillMap[id]?.connections.includes(selectedSkillId)))
+            return 'connected'
+        }
+        return 'online'
+      }
+      return 'offline'
+    }
     if (selectedSkillId === id) return 'selected'
     if (selectedSkillId) {
       const sel = skillMap[selectedSkillId]
@@ -286,12 +312,24 @@ export default function SkillsSection({ reducedMotion = false }: Props) {
     if (scene === 'activation' && activatedSkills.has(id)) return 'online'
     if (scene === 'diagnosis') return 'scanning'
     return 'offline'
-  }, [selectedSkillId, skillMap, scene, activatedSkills])
+  }, [selectedSkillId, scene, sequenceTargetId, isSequenceComplete, revealedSkills, skillMap, activatedSkills])
 
   const handleClick = useCallback((id: string) => {
     if (scene === 'breach' || scene === 'diagnosis') return
+
+    // Sequential reveal mode: only the pulsing target is clickable
+    if (scene === 'online' && !isSequenceComplete && sequenceTargetId) {
+      if (id !== sequenceTargetId) return  // ignore wrong node clicks
+      setRevealedSkills(prev => new Set([...prev, id]))
+      setSelectedSkillId(id)
+      setLastActivated(id)
+      setSequenceIndex(prev => prev + 1)
+      return
+    }
+
+    // Free-inspect mode after sequence is done
     setSelectedSkillId(prev => prev === id ? null : id)
-  }, [scene])
+  }, [scene, isSequenceComplete, sequenceTargetId])
 
   const canInteract = scene !== 'breach' && scene !== 'diagnosis'
 
@@ -328,24 +366,37 @@ export default function SkillsSection({ reducedMotion = false }: Props) {
 
       <SVGConnectionLayer
         connections={powerGridConnections}
-        activatedSkills={activatedSkills}
+        activatedSkills={scene === 'online' && !isSequenceComplete ? revealedSkills : activatedSkills}
         selectedSkillId={selectedSkillId}
         skillMap={skillMap}
         scene={scene}
       />
 
-      {powerGridSkills.map(skill => (
-        <SkillNode
-          key={skill.id}
-          skill={skill}
-          state={getNodeState(skill.id)}
-          canInteract={canInteract}
-          onClick={handleClick}
-        />
-      ))}
+      {powerGridSkills.map(skill => {
+        const nodeVisible =
+          scene !== 'online' ||
+          isSequenceComplete ||
+          revealedSkills.has(skill.id) ||
+          skill.id === sequenceTargetId
+        return (
+          <SkillNode
+            key={skill.id}
+            skill={skill}
+            state={getNodeState(skill.id)}
+            visible={nodeVisible}
+            canInteract={canInteract}
+            onClick={handleClick}
+          />
+        )
+      })}
 
       <AnimatePresence mode="wait">
-        <SceneTextBlock key={scene} scene={scene} />
+        <SceneTextBlock
+          key={scene}
+          scene={scene}
+          isSequenceMode={scene === 'online' && !isSequenceComplete}
+          sequenceTargetName={sequenceTargetSkill?.name ?? null}
+        />
       </AnimatePresence>
 
       <AnimatePresence>
@@ -358,6 +409,17 @@ export default function SkillsSection({ reducedMotion = false }: Props) {
       </AnimatePresence>
 
       <HUDLayer scene={scene} activatedCount={activatedSkills.size} />
+
+      <AnimatePresence>
+        {scene === 'online' && (
+          <SequenceGuideHUD
+            isComplete={isSequenceComplete}
+            current={Math.min(sequenceIndex + 1, ACTIVATION_ORDER.length)}
+            total={ACTIVATION_ORDER.length}
+            nextLabel={sequenceTargetSkill?.name ?? null}
+          />
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {selectedSkill && (
@@ -482,44 +544,58 @@ const SVGConnectionLayer = memo(function SVGConnectionLayer({
 interface NodeProps {
   skill: PowerGridSkill
   state: NodeState
+  visible: boolean
   canInteract: boolean
   onClick: (id: string) => void
 }
 
-const SkillNode = memo(function SkillNode({ skill, state, canInteract, onClick }: NodeProps) {
+const SkillNode = memo(function SkillNode({ skill, state, visible, canInteract, onClick }: NodeProps) {
   const pos = NODE_POSITIONS[skill.id]
   if (!pos) return null
 
   const C = CATEGORY_COLORS[skill.category] ?? CATEGORY_COLORS.frontend
-  const isOnline   = state === 'online' || state === 'selected' || state === 'connected'
+  const isOnline   = state === 'online' || state === 'selected' || state === 'connected' || state === 'activating'
   const isSelected = state === 'selected'
   const isConnected = state === 'connected'
+  const isActivating = state === 'activating'
   const isScanning = state === 'scanning'
   const isOffline  = state === 'offline'
 
-  const ringColor = isSelected ? '#58F6D2' : isConnected ? C.hex : isOnline ? C.hex : isScanning ? '#FFAA00' : '#440000'
-  const glowPx    = isSelected ? 28 : isConnected ? 20 : isOnline ? 16 : isScanning ? 10 : 4
-  const nodeSize  = isSelected ? 38 : 32
+  const ringColor = isSelected ? '#58F6D2' : isActivating ? '#58F6D2' : isConnected ? C.hex : isOnline ? C.hex : isScanning ? '#FFAA00' : '#440000'
+  const glowPx    = isSelected ? 28 : isActivating ? 24 : isConnected ? 20 : isOnline ? 16 : isScanning ? 10 : 4
+  const nodeSize  = isSelected ? 38 : isActivating ? 36 : 32
 
   return (
     <motion.button
       className="group absolute -translate-x-1/2 -translate-y-1/2 outline-none"
       style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
       onClick={() => onClick(skill.id)}
-      disabled={!canInteract}
+      disabled={!canInteract || !visible}
       initial={{ opacity: 0, scale: 0.4 }}
-      animate={{ opacity: isOffline ? 0.42 : 1, scale: 1 }}
-      transition={{ duration: 0.55, ease: [0.34,1.56,0.64,1] }}
-      whileHover={canInteract ? { scale: 1.14 } : undefined}
+      animate={{
+        opacity: !visible ? 0 : isOffline ? 0.42 : 1,
+        scale: !visible ? 0.1 : 1,
+      }}
+      transition={{ duration: 0.55, ease: [0.34, 1.56, 0.64, 1] }}
+      whileHover={canInteract && visible ? { scale: 1.14 } : undefined}
       aria-label={`${skill.name} — ${skill.strength}% mastery`}
     >
       {/* Outer ambient glow */}
       <motion.div
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
         style={{ width: nodeSize+glowPx*2+8, height: nodeSize+glowPx*2+8, background: `radial-gradient(circle,${ringColor}${isSelected?'1e':'12'} 0%,transparent 70%)` }}
-        animate={{ opacity: isOnline ? [0.5,1,0.5] : isScanning ? [0.25,0.7,0.25] : 0.35, scale: isSelected ? [1,1.09,1] : 1 }}
-        transition={isOnline ? { duration: 2.2, repeat: Infinity, ease: 'easeInOut' } : isScanning ? { duration: 1.1, repeat: Infinity, ease: 'easeInOut' } : {}}
+        animate={{ opacity: isActivating ? [0.7,1,0.7] : isOnline ? [0.5,1,0.5] : isScanning ? [0.25,0.7,0.25] : 0.35, scale: isSelected || isActivating ? [1,1.09,1] : 1 }}
+        transition={isActivating ? { duration: 0.8, repeat: Infinity, ease: 'easeInOut' } : isOnline ? { duration: 2.2, repeat: Infinity, ease: 'easeInOut' } : isScanning ? { duration: 1.1, repeat: Infinity, ease: 'easeInOut' } : {}}
       />
+
+      {isActivating && (
+        <motion.div
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-neon/70"
+          style={{ width: nodeSize+22, height: nodeSize+22 }}
+          animate={{ scale: [0.92, 1.16], opacity: [0.9, 0] }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'easeOut' }}
+        />
+      )}
 
       {/* Scanning ring */}
       {isScanning && (
@@ -582,7 +658,22 @@ const SkillNode = memo(function SkillNode({ skill, state, canInteract, onClick }
 // SCENE TEXT
 // ---------------------------------------------------------------------------
 
-function SceneTextBlock({ scene }: { scene: Scene }) {
+function SceneTextBlock({
+  scene,
+  isSequenceMode,
+  sequenceTargetName,
+}: {
+  scene: Scene
+  isSequenceMode: boolean
+  sequenceTargetName: string | null
+}) {
+  const [faded, setFaded] = useState(false)
+
+  useEffect(() => {
+    if (scene !== 'online') { setFaded(false); return }
+    const t = setTimeout(() => setFaded(true), 3500)
+    return () => clearTimeout(t)
+  }, [scene])
   const lines = SCENE_HEADLINE[scene].split('\n')
   const headColor: Record<Scene, string> = {
     breach: '#FF4444', diagnosis: '#FFB300', activation: '#58F6D2',
@@ -593,10 +684,12 @@ function SceneTextBlock({ scene }: { scene: Scene }) {
     <motion.div
       className="pointer-events-none absolute left-[4.5%] top-[8%]"
       initial={{ opacity: 0, x: -30 }}
-      animate={{ opacity: 1, x: 0 }}
+      animate={{ opacity: faded ? 0 : 1, x: faded ? -20 : 0 }}
       exit={{ opacity: 0, x: -20 }}
-      transition={{ duration: 0.65, ease: 'easeOut' }}
+      transition={{ duration: faded ? 0.9 : 0.65, ease: 'easeOut' }}
     >
+      <div className="absolute inset-x-[-14px] inset-y-[-12px] -z-10 rounded-lg border border-white/10 bg-black/35 backdrop-blur-sm" />
+
       {/* Status badge */}
       <motion.div className="mb-3 flex items-center gap-2" initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.15 }}>
         <motion.div
@@ -639,12 +732,23 @@ function SceneTextBlock({ scene }: { scene: Scene }) {
         {SCENE_SUBLINE[scene]}
       </motion.p>
 
-      {scene === 'online' && (
+      {scene === 'online' && !isSequenceMode && (
         <motion.p
           className="mt-5 font-mono text-[10px] uppercase tracking-[0.25em] text-white/30"
           initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.65 }}
         >
           Click any node to inspect
+        </motion.p>
+      )}
+
+      {scene === 'online' && isSequenceMode && sequenceTargetName && (
+        <motion.p
+          className="mt-5 font-mono text-[10px] uppercase tracking-[0.22em] text-neon/85"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.65 }}
+        >
+          Target module: {sequenceTargetName}
         </motion.p>
       )}
     </motion.div>
@@ -723,6 +827,45 @@ function HUDLayer({ scene, activatedCount }: { scene: Scene; activatedCount: num
         />
       )}
     </>
+  )
+}
+
+function SequenceGuideHUD({
+  isComplete,
+  current,
+  total,
+  nextLabel,
+}: {
+  isComplete: boolean
+  current: number
+  total: number
+  nextLabel: string | null
+}) {
+  const revealed = current - 1
+  const label = isComplete
+    ? 'All modules synced — free explore mode'
+    : revealed === 0
+      ? `Click the pulsing node to begin`
+      : `${revealed}/${total} synced — click: ${nextLabel ?? 'module'}`
+
+  return (
+    <motion.div
+      className="pointer-events-none absolute left-1/2 top-5 z-[5] -translate-x-1/2 rounded-lg border border-neon/30 bg-black/55 px-4 py-2 backdrop-blur-md"
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -8 }}
+      transition={{ duration: 0.28 }}
+    >
+      <div className="flex items-center gap-3">
+        <motion.div
+          className="h-1.5 w-1.5 rounded-full bg-neon"
+          animate={isComplete ? { opacity: 1 } : { opacity: [1, 0.3, 1] }}
+          transition={{ duration: 0.75, repeat: isComplete ? 0 : Infinity }}
+        />
+        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-neon/85">Guided Sync</span>
+        <span className="font-mono text-[10px] text-white/70">{label}</span>
+      </div>
+    </motion.div>
   )
 }
 

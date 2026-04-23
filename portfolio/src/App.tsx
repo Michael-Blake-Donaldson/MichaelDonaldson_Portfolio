@@ -79,7 +79,14 @@ function App() {
       '2': () => setActiveSection('projects'),
       '3': () => setActiveSection('command-center'),
       '4': () => setActiveSection('timeline'),
-      '5': () => setActiveSection('skills'),
+      '5': () => {
+        soundFx.playClick()
+        if (activeSection !== 'skills' && !isBreachTransitioning) {
+          setIsBreachTransitioning(true)
+          return
+        }
+        setActiveSection('skills')
+      },
       m: () => soundFx.toggle(),
       p: () => setShowParticles((prev) => !prev),
       r: () => setReducedMotionEnabled((prev) => !prev),
@@ -96,7 +103,7 @@ function App() {
         })
       },
     }),
-    [soundFx],
+    [activeSection, isBreachTransitioning, soundFx],
   )
 
   useEffect(() => {
