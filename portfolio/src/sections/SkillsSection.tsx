@@ -119,6 +119,12 @@ const ACTIVATION_MESSAGES: Record<string, string> = {
   'ux-design':      'INTERFACE INTEGRITY RESTORED',
 }
 
+const SCENE_SPEECH: Partial<Record<Scene, string>> = {
+  breach: '/audio/breach detected.mp3',
+  diagnosis: '/audio/repsonding to crisis.mp3',
+  activation: '/audio/threat eliminated.mp3',
+}
+
 // ---------------------------------------------------------------------------
 // SESSION CACHE — persists across component remounts within the same page load
 // ---------------------------------------------------------------------------
@@ -160,8 +166,25 @@ export default function SkillsSection({ reducedMotion = false }: Props) {
   const canvasRef  = useRef<HTMLCanvasElement>(null)
   const rafRef     = useRef<number>(0)
   const sceneRef   = useRef<Scene>('breach')
+  const sceneSpeechRef = useRef<Partial<Record<Scene, HTMLAudioElement>>>({})
+  const lastNarratedSceneRef = useRef<Scene | null>(null)
 
   useEffect(() => { sceneRef.current = scene }, [scene])
+
+  useEffect(() => {
+    const src = SCENE_SPEECH[scene]
+    if (!src || lastNarratedSceneRef.current === scene) return
+
+    lastNarratedSceneRef.current = scene
+
+    const audio = sceneSpeechRef.current[scene] ?? new Audio(src)
+    sceneSpeechRef.current[scene] = audio
+    audio.currentTime = 0
+
+    void audio.play().catch(() => {
+      // Ignore autoplay restrictions; later scene changes are typically gesture-initiated by entering the tab.
+    })
+  }, [scene])
 
   // entrance fade-in
   useEffect(() => {
