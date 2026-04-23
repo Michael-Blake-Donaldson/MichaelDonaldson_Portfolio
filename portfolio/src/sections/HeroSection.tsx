@@ -5,6 +5,7 @@ import { MagneticButton } from '../components/ui/MagneticButton'
 
 type HeroSectionProps = {
   onNavigateProjects: () => void
+  onNavigateTimeline: () => void
   pointer: { x: number; y: number }
   soundFx: {
     playHover: () => void
@@ -14,6 +15,7 @@ type HeroSectionProps = {
 
 export default function HeroSection({
   onNavigateProjects,
+  onNavigateTimeline,
   pointer,
   soundFx,
 }: HeroSectionProps) {
@@ -85,6 +87,7 @@ export default function HeroSection({
         </MagneticButton>
         <MagneticButton
           tone="ghost"
+          onClick={onNavigateTimeline}
           onHoverSound={soundFx.playHover}
           onClickSound={soundFx.playClick}
         >

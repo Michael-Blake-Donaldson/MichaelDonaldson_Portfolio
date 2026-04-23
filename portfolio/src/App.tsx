@@ -176,6 +176,7 @@ function App() {
                 {activeSection === 'hero' ? (
                   <HeroSection
                     onNavigateProjects={() => setActiveSection('projects')}
+                    onNavigateTimeline={() => setActiveSection('timeline')}
                     pointer={pointer}
                     soundFx={soundFx}
                   />
