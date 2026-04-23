@@ -1,12 +1,14 @@
 import { useEffect, useRef } from 'react'
 import cursorImg from '../../assets/cursor/Astronaut Hand & Helmet--cursor--SweezyCursors.png'
 
-// Cursor image size rendered on screen (px)
-const SIZE = 72
-// Hotspot offset: fingertip is near top-right of the image.
-// Shift left by ~55% of width and up by ~5% of height so the tip aligns with the click point.
-const OFFSET_X = Math.round(SIZE * 0.55)
-const OFFSET_Y = Math.round(SIZE * 0.05)
+const SIZE = 64
+// Finger tip sits near the right/top edge of this artwork.
+const HOTSPOT_X = Math.round(SIZE * 0.92)
+const HOTSPOT_Y = Math.round(SIZE * 0.14)
+
+function clamp(n: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, n))
+}
 
 export function CustomCursor() {
   const cursorRef = useRef<HTMLImageElement | null>(null)
@@ -15,36 +17,65 @@ export function CustomCursor() {
     const cursor = cursorRef.current
     if (!cursor) return
 
+    let pointerX = -200
+    let pointerY = -200
+    let currentX = -200
+    let currentY = -200
+    let pressed = false
+    let hoveringInteractive = false
+    let rafId = 0
+
+    const render = () => {
+      currentX += (pointerX - currentX) * 0.28
+      currentY += (pointerY - currentY) * 0.28
+      const scale = pressed ? 0.9 : hoveringInteractive ? 1.06 : 1
+      cursor.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) scale(${scale})`
+      cursor.style.filter = hoveringInteractive
+        ? 'drop-shadow(0 0 8px rgba(88,246,210,0.7)) brightness(1.12)'
+        : 'none'
+      rafId = window.requestAnimationFrame(render)
+    }
+
     const onMove = (e: MouseEvent) => {
-      cursor.style.transform = `translate3d(${e.clientX - OFFSET_X}px, ${e.clientY - OFFSET_Y}px, 0)`
+      const x = clamp(e.clientX - HOTSPOT_X, 0, window.innerWidth - SIZE)
+      const y = clamp(e.clientY - HOTSPOT_Y, 0, window.innerHeight - SIZE)
+      pointerX = x
+      pointerY = y
     }
 
-    const onDown = () => { cursor.style.transform += ' scale(0.88)' }
-    const onUp   = () => {} // scale resets on next mousemove
-
-    const onEnterClickable = () => { cursor.style.filter = 'drop-shadow(0 0 8px rgba(88,246,210,0.75)) brightness(1.15)' }
-    const onLeaveClickable = () => { cursor.style.filter = '' }
-
-    // Observe pointer-cursor elements for hover effect
-    const observer = new MutationObserver(() => {})
-
-    const attachHover = () => {
-      document.querySelectorAll<HTMLElement>('a,button,[role="button"],[tabindex]').forEach(el => {
-        el.addEventListener('mouseenter', onEnterClickable)
-        el.addEventListener('mouseleave', onLeaveClickable)
-      })
+    const onDown = () => {
+      pressed = true
     }
-    attachHover()
+
+    const onUp = () => {
+      pressed = false
+    }
+
+    const onOver = (e: MouseEvent) => {
+      const target = e.target as Element | null
+      hoveringInteractive = !!target?.closest('a,button,[role="button"],input,textarea,select,summary,label,[tabindex]:not([tabindex="-1"])')
+    }
+
+    const onResize = () => {
+      pointerX = clamp(pointerX, 0, window.innerWidth - SIZE)
+      pointerY = clamp(pointerY, 0, window.innerHeight - SIZE)
+    }
 
     window.addEventListener('mousemove', onMove)
     window.addEventListener('mousedown', onDown)
     window.addEventListener('mouseup', onUp)
+    window.addEventListener('mouseover', onOver)
+    window.addEventListener('resize', onResize)
+
+    rafId = window.requestAnimationFrame(render)
 
     return () => {
       window.removeEventListener('mousemove', onMove)
       window.removeEventListener('mousedown', onDown)
       window.removeEventListener('mouseup', onUp)
-      observer.disconnect()
+      window.removeEventListener('mouseover', onOver)
+      window.removeEventListener('resize', onResize)
+      window.cancelAnimationFrame(rafId)
     }
   }, [])
 
@@ -54,14 +85,14 @@ export function CustomCursor() {
       src={cursorImg}
       alt=""
       aria-hidden
-      className="pointer-events-none fixed left-0 top-0 z-[9999] hidden select-none md:block"
+      className="custom-cursor pointer-events-none fixed left-0 top-0 z-[9999] block select-none"
       style={{
         width: SIZE,
         height: SIZE,
         objectFit: 'contain',
-        willChange: 'transform',
+        transformOrigin: `${HOTSPOT_X}px ${HOTSPOT_Y}px`,
+        willChange: 'transform, filter',
         transition: 'filter 0.15s ease',
-        // start off-screen
         transform: `translate3d(-200px,-200px,0)`,
       }}
       draggable={false}

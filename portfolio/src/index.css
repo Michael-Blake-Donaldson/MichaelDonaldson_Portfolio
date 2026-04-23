@@ -28,12 +28,12 @@ body {
   background: #070a13;
   color: #eef4ff;
   overflow-x: hidden;
-  cursor: none;
 }
 
 /* Restore default cursor on touch/mobile where CustomCursor is hidden */
 @media (pointer: coarse) {
   body { cursor: auto; }
+  .custom-cursor { display: none !important; }
 }
 
 :focus-visible {
@@ -81,6 +81,13 @@ body {
   html,
   body,
   * {
+    cursor: none !important;
+  }
+
+  ::-webkit-scrollbar,
+  ::-webkit-scrollbar-thumb,
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
     cursor: none !important;
   }
 }
