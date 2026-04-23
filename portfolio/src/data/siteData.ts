@@ -12,9 +12,8 @@ import plantShot from '../assets/screenshots/PHmain.jpeg'
 export const navItems: NavItem[] = [
   { id: 'hero', label: 'Neural Deck', shortcut: '1' },
   { id: 'projects', label: 'Project Vault', shortcut: '2' },
-  { id: 'command-center', label: 'Command Center', shortcut: '3' },
-  { id: 'timeline', label: 'Flux Timeline', shortcut: '4' },
-  { id: 'skills', label: 'Skill Graph', shortcut: '5' },
+  { id: 'timeline', label: 'Flux Timeline', shortcut: '3' },
+  { id: 'skills', label: 'Skill Graph', shortcut: '4' },
 ]
 
 export const projects: ProjectItem[] = [
