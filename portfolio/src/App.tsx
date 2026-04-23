@@ -2,9 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import { BootSequence } from './components/effects/BootSequence'
 import { SystemBreachTransition } from './components/effects/SystemBreachTransition'
-import { CustomCursor } from './components/effects/CustomCursor'
 import { ParticleField } from './components/effects/ParticleField'
-import { CustomScrollbar } from './components/navigation/CustomScrollbar'
 import { CommandPalette } from './components/navigation/CommandPalette'
 import { FloatingDock } from './components/navigation/FloatingDock'
 import { navItems, projects } from './data/siteData'
@@ -130,8 +128,6 @@ function App() {
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-abyss text-white">
       {showParticles && !reducedMotionEnabled ? <ParticleField /> : null}
-      {!reducedMotionEnabled ? <CustomCursor /> : null}
-      <CustomScrollbar activeSection={activeSection} />
 
       <div className="pointer-events-none fixed inset-0 z-0 bg-noise opacity-90" />
       <div className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(circle_at_50%_120%,rgba(255,90,191,0.15),transparent_60%)]" />
