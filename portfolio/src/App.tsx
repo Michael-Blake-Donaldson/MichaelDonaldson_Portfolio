@@ -27,6 +27,7 @@ const sectionOrder: SectionId[] = [
 
 const INTRO_NARRATION_SRC = '/audio/LoadInSpeech.mp3'
 const PROJECT_VAULT_SPEECH_SRC = '/audio/ProjectVaultSpeech.mp3'
+const FLUX_TIMELINE_SPEECH_SRC = '/audio/FluxTimelineSpeech.mp3'
 
 function App() {
   const [activeSection, setActiveSection] = useState<SectionId>('hero')
@@ -46,10 +47,20 @@ function App() {
   const transitionPolicy = getTransitionPolicy(reducedMotionEnabled)
   const introNarrationAttemptedRef = useRef(false)
   const projectVaultSpeechRef = useRef<HTMLAudioElement | null>(null)
+  const fluxTimelineSpeechRef = useRef<HTMLAudioElement | null>(null)
 
   const playProjectVaultSpeech = useCallback(() => {
     const audio = projectVaultSpeechRef.current ?? new Audio(PROJECT_VAULT_SPEECH_SRC)
     projectVaultSpeechRef.current = audio
+    audio.currentTime = 0
+    void audio.play().catch(() => {
+      // Ignore autoplay restrictions; this should normally be user-gesture initiated.
+    })
+  }, [])
+
+  const playFluxTimelineSpeech = useCallback(() => {
+    const audio = fluxTimelineSpeechRef.current ?? new Audio(FLUX_TIMELINE_SPEECH_SRC)
+    fluxTimelineSpeechRef.current = audio
     audio.currentTime = 0
     void audio.play().catch(() => {
       // Ignore autoplay restrictions; this should normally be user-gesture initiated.
@@ -163,13 +174,16 @@ function App() {
       if (id === 'projects') {
         playProjectVaultSpeech()
       }
+      if (id === 'timeline') {
+        playFluxTimelineSpeech()
+      }
       if (id === 'skills' && activeSection !== 'skills' && !isBreachTransitioning) {
         setIsBreachTransitioning(true)
         return
       }
       setActiveSection(id)
     },
-    [activeSection, isBreachTransitioning, playProjectVaultSpeech, soundFx],
+    [activeSection, isBreachTransitioning, playFluxTimelineSpeech, playProjectVaultSpeech, soundFx],
   )
 
   useKeyboardShortcuts(shortcuts)
