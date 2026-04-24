@@ -170,7 +170,7 @@ export default function TimelineSection() {
         }
       })
 
-      gsap.to('.timeline-cosmos', {
+      gsap.to(root, {
         backgroundPositionY: 260,
         ease: 'none',
         scrollTrigger: {

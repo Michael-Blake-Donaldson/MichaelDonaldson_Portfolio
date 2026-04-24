@@ -25,10 +25,12 @@ const sectionOrder: SectionId[] = [
   'skills',
 ]
 
-const INTRO_NARRATION_SRC = '/audio/LoadInSpeech.mp3'
-const PROJECT_VAULT_SPEECH_SRC = '/audio/ProjectVaultSpeech.mp3'
-const FLUX_TIMELINE_SPEECH_SRC = '/audio/FluxTimelineSpeech.mp3'
-const SKILL_GRAPH_SPEECH_SRC = '/audio/SkillGraphSpeech.mp3'
+const assetFromBase = (relativePath: string) => `${import.meta.env.BASE_URL}${relativePath}`
+
+const INTRO_NARRATION_SRC = assetFromBase('audio/LoadInSpeech.mp3')
+const PROJECT_VAULT_SPEECH_SRC = assetFromBase('audio/ProjectVaultSpeech.mp3')
+const FLUX_TIMELINE_SPEECH_SRC = assetFromBase('audio/FluxTimelineSpeech.mp3')
+const SKILL_GRAPH_SPEECH_SRC = assetFromBase('audio/SkillGraphSpeech.mp3')
 
 function stopAudio(audio: HTMLAudioElement | null) {
   if (!audio) return
